@@ -3,833 +3,1227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>숫자야구 & 베팅 게임 (Ewha Edition)</title>
+    <title>이화 멀티 뉴머릭 배틀 (EMB) - Official Platform</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #27ae60;
-            --accent: #9b59b6;
-            --danger: #e74c3c;
-            --warning: #f1c40f;
-            --light: #ecf0f1;
+            --primary-color: #00462A; /* 이화여고 고유의 딥그린 */
+            --primary-light: #e6f0ec;
+            --accent-gold: #cfa145;
+            --accent-red: #d32f2f;
+            --dark-gray: #2d3748;
+            --light-gray: #f7fafc;
+            --border-color: #e2e8f0;
         }
-        body { font-family: 'Pretendard', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--primary); margin: 0; color: #333; }
-        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); text-align: center; width: 480px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
-        h1 { font-size: 22px; margin-bottom: 15px; color: var(--primary); }
-        h2 { font-size: 16px; margin-bottom: 10px; color: #555; }
-        p { font-size: 14px; line-height: 1.5; margin: 10px 0; }
-        input, select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px; box-sizing: border-box; }
-        button { background-color: #3498db; color: white; border: none; padding: 12px 20px; font-size: 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-bottom: 10px; transition: 0.2s; font-weight: bold; }
-        button:hover { background-color: #2980b9; }
-        .btn-secondary { background-color: var(--secondary); }
-        .btn-secondary:hover { background-color: #219653; }
-        .btn-accent { background-color: var(--accent); }
-        .btn-accent:hover { background-color: #8e44ad; }
-        .btn-danger { background-color: var(--danger); }
-        .btn-danger:hover { background-color: #c0392b; }
-        .btn-outline { background-color: white; color: #333; border: 1px solid #ccc; }
-        .btn-outline:hover { background-color: #f0f0f0; }
-        .hidden { display: none; }
-        
-        /* 카드 배치 디자인 */
-        .card-container { display: flex; justify-content: center; gap: 10px; margin: 15px 0; }
-        .card-input { width: 70px; height: 90px; font-size: 26px; text-align: center; border: 2px solid var(--primary); border-radius: 8px; font-weight: bold; }
-        
-        /* 기록지 및 정보창 */
-        .record-sheet { background: var(--light); border-radius: 8px; padding: 12px; text-align: left; height: 150px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #bdc3c7; font-size: 13px; }
-        .record-item { margin-bottom: 5px; border-bottom: 1px dashed #ddd; padding-bottom: 3px; }
-        .highlight { color: var(--danger); font-weight: bold; }
-        .badge { background: var(--warning); color: #333; padding: 2px 6px; border-radius: 10px; font-size: 11px; font-weight: bold; }
-        
-        /* 토큰 선택 버튼형 */
-        .token-selector { display: flex; justify-content: space-around; margin: 10px 0; }
-        .token-btn { width: auto; font-size: 12px; padding: 6px 10px; border-radius: 20px; }
-        .token-w { background: #fff; color: #333; border: 1px solid #ccc; }
-        .token-p { background: #ffc0cb; color: #333; }
-        .token-r { background: #ff4d4d; color: #fff; }
-        .token-b { background: #4da6ff; color: #fff; }
-        .token-g { background: #4dff4d; color: #333; }
-        .token-blk { background: #000; color: #fff; }
-        
-        /* 룸 리스트 아이템 */
-        .room-item { border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: left; background-color: #fafafa; position: relative; }
-        .room-item p { margin: 3px 0; font-size: 13px; }
-        .room-join-btn { position: absolute; right: 12px; top: 35%; width: auto; padding: 8px 12px; font-size: 13px; margin: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #edf2f7;
+            color: var(--dark-gray);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 헤더 스타일 */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            margin-bottom: 25px;
+            position: relative;
+        }
+        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+        header p { margin: 8px 0 0 0; opacity: 0.9; font-size: 14px; }
+
+        /* 메인 레이아웃 Grid */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 25px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+
+        /* 공통 카드 컴포넌트 */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 로그인 / 회원가입 UI */
+        .auth-container {
+            max-width: 450px;
+            margin: 100px auto;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: var(--light-gray);
+            transition: all 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(0, 70, 42, 0.15);
+        }
+
+        /* 이화 스타일 버튼 */
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+        button:hover { background-color: #00301d; }
+        button:disabled { background-color: #cbd5e0; cursor: not-allowed; }
+        .btn-secondary { background-color: #718096; }
+        .btn-secondary:hover { background-color: #4a5568; }
+        .btn-danger { background-color: var(--accent-red); }
+        .btn-danger:hover { background-color: #9b1c1c; }
+        .btn-accent { background-color: var(--accent-gold); color: #fff; }
+        .btn-accent:hover { background-color: #b0822e; }
+
+        /* 토큰 상점 환전소 */
+        .token-exchange-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .token-item {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .token-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 2px dashed #718096;
+            margin-bottom: 5px;
+            vertical-align: middle;
+        }
+        .white-tok { background-color: #ffffff; border-color: #d1d5db; }
+        .pink-tok { background-color: #ffb6c1; border-color: #f472b6; }
+        .red-tok { background-color: #ef4444; border-color: #b91c1c; }
+        .blue-tok { background-color: #3b82f6; border-color: #1d4ed8; }
+        .green-tok { background-color: #10b981; border-color: #047857; }
+        .black-tok { background-color: #111827; border-color: #000000; }
+
+        /* 규정집 상시 열람 */
+        .rules-book-box {
+            height: 520px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.6;
+            background: var(--light-gray);
+            border: 1px dashed var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .rules-book-box h3 { color: var(--primary-color); margin-top: 15px; border-left: 3px solid var(--accent-gold); padding-left: 8px; }
+        .rules-book-box ul { padding-left: 20px; }
+
+        /* 게임 보드 화면 */
+        .game-screen {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        .card-slot-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+        }
+        .card-slot {
+            width: 100px;
+            height: 150px;
+            border: 3px dashed var(--accent-gold);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            background-color: #fff;
+            position: relative;
+        }
+        .slot-label {
+            position: absolute;
+            bottom: -25px;
+            font-size: 12px;
+            color: #718096;
+            font-weight: bold;
+        }
+        .card-choice-btn {
+            width: 42px;
+            height: 55px;
+            margin: 4px;
+            font-size: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        .card-choice-btn.selected {
+            background-color: var(--accent-gold);
+        }
+
+        /* 기록지 오버레이 */
+        .notepad {
+            background-color: #fefbeb;
+            border: 1px solid #fef08a;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .notepad-title {
+            font-weight: bold;
+            border-bottom: 1px solid #fef08a;
+            margin-bottom: 8px;
+            color: #854d0e;
+        }
+
+        /* 로그창 */
+        .log-container {
+            background-color: #1a202c;
+            color: #48bb78;
+            padding: 15px;
+            border-radius: 8px;
+            height: 180px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
 
-<!-- 1. 로그인 화면 -->
-<div class="container" id="loginScreen">
-    <h1>🎯 확률 & 논리 베팅 게임</h1>
-    <p>이화여고 공식 전용 서버<br>학교 계정(@ewha.hs.kr)으로 접속해주세요.</p>
-    <button id="loginBtn">Google 학교 계정으로 가입/로그인</button>
-</div>
+<div class="container">
+    <!-- 통합 헤더 -->
+    <header>
+        <h1>🏫 Ewha Multi-Numeric Battle (EMB)</h1>
+        <p>이화고등학교 이메일 전용 실시간 심리 확률 & 논리 토큰 베팅전</p>
+    </header>
 
-<!-- 2. 닉네임 설정 화면 -->
-<div class="container hidden" id="nicknameScreen">
-    <h1>📛 닉네임 중복 확인 및 가입</h1>
-    <p>게임 내에서 사용하실 고유 닉네임을 정해주세요.</p>
-    <input type="text" id="nicknameInput" placeholder="닉네임 입력 (2~10자)">
-    <button id="checkNicknameBtn">닉네임 중복확인 및 회원가입 ($500 획득)</button>
-</div>
-
-<!-- 3. 메인 로비 (모드 선택) -->
-<div class="container hidden" id="modeSelectScreen">
-    <h1>🎮 로비 메인화면</h1>
-    <div id="userInfoDisplay" style="background:#e8f8f5; padding:10px; border-radius:8px; margin-bottom:15px;"></div>
-    
-    <button id="btnAiMode" class="btn-accent">🤖 AI 연습게임 (자금 미반영)</button>
-    <button id="btnMultiMode" class="btn-secondary">👥 멀티플레이 실전 베팅 서버</button>
-    <button id="btnExchange" class="btn-outline">💰 토큰 시세 보기 및 환전소</button>
-    <button id="btnLogOut" class="btn-danger" style="margin-top: 20px; font-size: 13px; padding: 8px;">로그아웃</button>
-</div>
-
-<!-- 4. 환전소 팝업/화면 -->
-<div class="container hidden" id="exchangeScreen">
-    <h1>💰 토큰 환전소</h1>
-    <p>보유 중인 달러($)로 게임 토큰 가격을 확인하세요.</p>
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size:13px;">
-        <tr style="border-bottom: 1px solid #ccc;"><th style="padding:8px;">색상</th><th>가치</th></tr>
-        <tr><td>하얀색 ⚪</td><td>$1</td></tr>
-        <tr><td>분홍색 💗</td><td>$2</td></tr>
-        <tr><td>빨간색 🔴</td><td>$5</td></tr>
-        <tr><td>파란색 🔵</td><td>$10</td></tr>
-        <tr><td>초록색 🟢</td><td>$25</td></tr>
-        <tr><td>검은색 ⚫</td><td>$100</td></tr>
-    </table>
-    <button id="btnExitExchange" class="btn-danger">로비로 가기</button>
-</div>
-
-<!-- 5. AI 연습게임 화면 -->
-<div class="container hidden" id="aiGameScreen">
-    <h1>🤖 AI 연습게임 판</h1>
-    <p>AI가 임의로 1~10번 카드 3장을 비밀리에 배치했습니다.<br>위치를 맞추면 <b>스트라이크</b>, 숫자만 맞추면 <b>볼</b>입니다.</p>
-    
-    <div class="card-container">
-        <input type="number" id="aiGuess1" class="card-input" min="1" max="10" placeholder="왼">
-        <input type="number" id="aiGuess2" class="card-input" min="1" max="10" placeholder="중">
-        <input type="number" id="aiGuess3" class="card-input" min="1" max="10" placeholder="오">
-    </div>
-    
-    <button id="btnSubmitAiGuess">판정 시스템에 제출하기</button>
-    
-    <h3>📝 나의 추측 기록지</h3>
-    <div class="record-sheet" id="aiRecordSheet"></div>
-    <button id="btnExitAiMode" class="btn-danger">연습 종료 및 나가기</button>
-</div>
-
-<!-- 6. 멀티플레이 서버 로비 -->
-<div class="container hidden" id="multiplayerScreen">
-    <h1>👥 멀티플레이 서버 대기실</h1>
-    <button id="btnShowCreateRoom" class="btn-secondary">➕ 방 만들기 (새 게임 개설)</button>
-    <button id="btnBackToMode" class="btn-outline">◀ 메인 로비로 가기</button>
-    
-    <h2>개설된 게임 서버 목록</h2>
-    <div id="roomList" style="max-height: 300px; overflow-y: auto;">
-        <!-- 개설된 방 리스트 동적 추가 -->
-    </div>
-</div>
-
-<!-- 7. 방 만들기 설정창 -->
-<div class="container hidden" id="createRoomScreen">
-    <h1>🛠 새 게임방 개설</h1>
-    
-    <label><b>참여자 수 설정</b></label>
-    <select id="roomPlayers">
-        <option value="2">2명 (1대1)</option>
-        <option value="3">3명</option>
-        <option value="4">4명</option>
-    </select>
-
-    <label><b>진행 시간 설정</b></label>
-    <select id="roomTime">
-        <option value="10">10분</option>
-        <option value="15">15분</option>
-        <option value="20">20분</option>
-    </select>
-
-    <label><b>입장 시 필수 베팅 토큰 (기본 참가비)</b></label>
-    <select id="roomFee">
-        <option value="1">⚪ 하얀색 토큰 ($1)</option>
-        <option value="2">💗 분홍색 토큰 ($2)</option>
-        <option value="5">🔴 빨간색 토큰 ($5)</option>
-        <option value="10">🔵 파란색 토큰 ($10)</option>
-        <option value="25">🟢 초록색 토큰 ($25)</option>
-        <option value="100">⚫ 검은색 토큰 ($100)</option>
-    </select>
-
-    <button id="btnCreateRoomSubmit" class="btn-secondary">이 조건으로 방 생성하기</button>
-    <button id="btnCancelCreate" class="btn-outline">취소</button>
-</div>
-
-<!-- 8. 실전 멀티플레이 게임방 (핵심 실시간 화면) -->
-<div class="container hidden" id="activeGameScreen" style="width: 520px;">
-    <h1 id="gameRoomTitle">🎮 게임 진행 중</h1>
-    <div style="display:flex; justify-content:space-between; font-size:12px; background:#fafafa; padding:8px; border-radius:5px;">
-        <span id="gameTimer">⏱ 남은 시간: --:--</span>
-        <span id="gameTotalPot" style="color:var(--secondary); font-weight:bold;">💰 총 상금 팟: $0</span>
-    </div>
-
-    <!-- 카드 3장 세팅창 (게임 시작시 처음 딱 한번 입력) -->
-    <div id="cardSetupArea" style="margin-top: 15px; border:2px dashed var(--accent); padding:10px; border-radius:8px;">
-        <h3>🃏 내 수비 카드 세팅 (1~10 중 중복없이 선택)</h3>
-        <p>상대방이 맞춰야 하는 나의 카드 배열을 결정하세요.</p>
-        <div class="card-container">
-            <input type="number" id="setupCard1" class="card-input" placeholder="왼">
-            <input type="number" id="setupCard2" class="card-input" placeholder="중">
-            <input type="number" id="setupCard3" class="card-input" placeholder="오">
+    <!-- [1단계] 회원가입 / 로그인 화면 -->
+    <div id="view-auth" class="auth-container card">
+        <h3 style="text-align: center; color: var(--primary-color); margin-top: 0;">🔐 학생 인증 로그인</h3>
+        <p style="text-align: center; font-size: 12px; color: #718096;">@ewha.hs.kr 도메인만 가입 허용</p>
+        <div class="form-group">
+            <label>학교 메일 계정</label>
+            <input type="email" id="auth-email" placeholder="student@ewha.hs.kr">
         </div>
-        <button id="btnConfirmSetup" class="btn-accent">내 수비 카드 확정 제출</button>
-    </div>
-
-    <!-- 플레이어 목록 & 현재 턴 상태 -->
-    <div style="margin-top:15px; text-align:left;">
-        <h3>👥 참가 플레이어 현황 (<span id="turnStatus" style="color:var(--danger);">대기중...</span>)</h3>
-        <div id="playerStatusList" style="font-size:13px; background:#f5f6fa; padding:10px; border-radius:5px;"></div>
-    </div>
-
-    <hr style="margin: 20px 0; border:0; border-top:1px solid #eee;">
-
-    <!-- 내 차례 실행 행동 제어창 -->
-    <div id="actionArea" class="hidden" style="border: 2px solid var(--secondary); padding: 12px; border-radius: 8px; background: #fdfefe;">
-        <h3 style="color:var(--secondary); margin-top:0;">⚡ 내 턴! 행동 선택</h3>
-        
-        <label>지목할 상대 선택:</label>
-        <select id="targetPlayerSelect"></select>
-
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <button id="btnActionGuess" style="background:#2980b9; margin:0;">🎯 일반 추측</button>
-            <button id="btnActionHint" style="background:var(--warning); color:#333; margin:0;">💡 힌트 베팅 요구</button>
-            <button id="btnActionShowdown" style="background:var(--danger); margin:0;">🔥 쇼다운 선언</button>
+        <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" id="auth-password" placeholder="비밀번호 6자리 이상">
         </div>
+        <button id="btn-submit-auth" style="width: 100%; margin-top: 10px;">로그인 / 가입</button>
+    </div>
 
-        <!-- 액션 서브 폼 (추측 전용) -->
-        <div id="subFormGuess" class="hidden">
-            <p>상대의 3자리 숫자를 입력하세요.</p>
-            <div class="card-container">
-                <input type="number" id="guessVal1" style="width:50px; text-align:center;" min="1" max="10">
-                <input type="number" id="guessVal2" style="width:50px; text-align:center;" min="1" max="10">
-                <input type="number" id="guessVal3" style="width:50px; text-align:center;" min="1" max="10">
+    <!-- [2단계] 고유 닉네임 생성 화면 -->
+    <div id="view-nickname" class="auth-container card" style="display: none;">
+        <h3 style="color: var(--primary-color); margin-top: 0;">✏️ 닉네임 설정</h3>
+        <p style="font-size: 12px; color: #718096;">중복 사용이 불가능하며, 언제든 수정 시 유일성을 검증합니다.</p>
+        <div class="form-group">
+            <label>닉네임 입력</label>
+            <input type="text" id="reg-nickname" placeholder="사용할 닉네임">
+        </div>
+        <button id="btn-submit-nickname" style="width: 100%;">중복 검사 후 프로필 승인</button>
+    </div>
+
+    <!-- [3단계] 로비 및 게임판 화면 (통합 그리드) -->
+    <div id="view-lobby" class="grid-layout" style="display: none;">
+        <!-- 좌측 제어판 / 게임판 -->
+        <div class="main-panel">
+            <!-- 유저 자금 및 환전소 정보 카드 -->
+            <div class="card" style="background-color: var(--primary-light); border-left: 6px solid var(--primary-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="font-size: 18px; color: var(--primary-color);">학생 프로필: <span id="lbl-nickname">이화인</span></strong><br>
+                        <span style="font-size: 14px;">보유 달러: <strong style="color: green;" id="lbl-balance">$500</strong></span>
+                    </div>
+                    <div>
+                        <button class="btn-accent" onclick="openExchangeModal()">🏦 환전 상점 열기</button>
+                    </div>
+                </div>
             </div>
-            <button id="btnSubmitGuess" class="btn-secondary">추측 제출</button>
+
+            <!-- 게임 모드 선택 판넬 -->
+            <div id="lobby-modes" class="card">
+                <div class="card-title">🕹️ 대전 모드 선택</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; text-align: center;">
+                        <h4>🤖 AI 연습 모드</h4>
+                        <p style="font-size: 12px; color: #718096;">내 정보에 영향이 가지 않으며 실시간 연습이 가능한 가상 게임</p>
+                        <button onclick="startAiGame()" style="width: 100%;">연습 시작</button>
+                    </div>
+                    <div style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; text-align: center;">
+                        <h4>👥 실시간 멀티플레이</h4>
+                        <p style="font-size: 12px; color: #718096;">로비 속 다른 학생 방에 입장하거나 서버 방을 직접 개설</p>
+                        <button class="btn-accent" onclick="showServerCreation()" style="width: 100%;">멀티서버 개설</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <div class="card-title">🌐 활성화된 대전 목록 (실시간 서버리스트)</div>
+                    <div id="server-list" style="color: #718096; text-align: center; padding: 20px;">
+                        개설된 서버가 없습니다. 우측 위의 '멀티서버 개설'을 통해 직접 생성해보세요!
+                    </div>
+                </div>
+            </div>
+
+            <!-- [게임 인터페이스 메인 프레임] -->
+            <div id="game-active-area" class="card" style="display: none;">
+                <div class="card-title">
+                    <span id="game-title">🎮 AI 연습 게임판</span>
+                    <span id="game-timer" style="color: var(--accent-red); font-weight: bold;">남은시간: 10:00</span>
+                </div>
+
+                <!-- 1단계: 내 카드 3장 배치 단계 -->
+                <div id="game-setup-phase">
+                    <h4 style="text-align: center;">1부터 10까지 카드 중 [왼쪽] [가운데] [오른쪽]에 둘 카드 3장을 고르세요.</h4>
+                    <div class="card-slot-container">
+                        <div class="card-slot" id="slot-left"><span class="slot-label">왼쪽</span></div>
+                        <div class="card-slot" id="slot-mid"><span class="slot-label">가운데</span></div>
+                        <div class="card-slot" id="slot-right"><span class="slot-label">오른쪽</span></div>
+                    </div>
+                    <div id="card-choice-pool" style="text-align: center; margin-top: 40px;">
+                        <!-- JS에서 버튼 생성 -->
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn-accent" onclick="confirmCardSetup()">배치 완료 및 시작</button>
+                    </div>
+                </div>
+
+                <!-- 2단계: 메인 게임 진행 보드 -->
+                <div id="game-play-phase" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <h4>🎯 상대 카드 추측 공격</h4>
+                            <div class="form-group">
+                                <label>타겟 선택</label>
+                                <select id="guess-target">
+                                    <option value="AI">AI (상대)</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                <input type="number" id="guess-l" placeholder="왼쪽" min="1" max="10">
+                                <input type="number" id="guess-m" placeholder="가운데" min="1" max="10">
+                                <input type="number" id="guess-r" placeholder="오른쪽" min="1" max="10">
+                            </div>
+                            <button style="width:100%; margin-bottom: 10px;" onclick="submitPlayerGuess()">추측 제출 (시스템 오토판정)</button>
+                            <button style="width:100%;" class="btn-accent" onclick="openHintModal()">💡 토큰 베팅 힌트 요구하기 (인당 1회)</button>
+                            <button style="width:100%; margin-top: 10px;" class="btn-danger" onclick="triggerShowdown()">💥 쇼다운 외치기 (All-in 배팅)</button>
+                        </div>
+
+                        <div>
+                            <h4>📝 내 생각 정리 및 기록지</h4>
+                            <div class="notepad">
+                                <div class="notepad-title">💡 숫자 야구 추론 메모</div>
+                                <textarea id="game-note" rows="8" style="background: transparent; border: none; resize: none; width: 100%;" placeholder="여기에 추측된 상대 번호를 기록하고 소거해 나가세요. (예: AI - 3S 0B, 5번은 가운데가 유력...)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="log-container" id="game-log">
+                        [시스템] 게임이 시작되었습니다. 원 스트라이크, 원 볼 등을 시스템이 정밀 연산하여 출력합니다.
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- 액션 서브 폼 (힌트 베팅) -->
-        <div id="subFormHint" class="hidden">
-            <p>어떤 힌트를 요구하시겠습니까?</p>
-            <select id="hintType">
-                <option value="sum">세 장 카드의 합이 ? 이상인가?</option>
-                <option value="odd">세 장 중 홀수의 개수는 몇 개인가?</option>
-                <option value="over">특정 칸의 카드가 ? 이상인가?</option>
-            </select>
-            <input type="number" id="hintQueryVal" placeholder="비교할 숫자를 적으세요 (?부분)">
-            
-            <p>베팅할 토큰 액수 설정 ($):</p>
-            <input type="number" id="hintBetAmount" min="1" placeholder="가진 돈 한도내에서 입력">
-            <button id="btnSubmitHint" class="btn-accent">힌트 베팅 요청 보내기</button>
+        <!-- 우측 규칙 설명 영역 (상시 노출 보장) -->
+        <div class="side-panel">
+            <div class="card" style="padding: 15px;">
+                <div class="card-title" style="margin-bottom: 10px;">📜 EMB 규정 및 진행법</div>
+                <div class="rules-book-box">
+                    <h3>1. 기본 계정 체계</h3>
+                    <p>오직 <strong>@ewha.hs.kr</strong> 이메일로만 가입할 수 있으며, 최초 가입 시 전원에게 공평하게 <strong>$500의 달러 자금</strong>이 자동 지급됩니다.</p>
+                    
+                    <h3>2. 토큰 환율 및 환전</h3>
+                    <p>보유 달러는 아래 가이드라인의 시세로 즉시 교환하여 게임에 투입합니다.</p>
+                    <ul>
+                        <li>⚪ 하얀색 토큰: $1</li>
+                        <li>🌸 분홍색 토큰: $2</li>
+                        <li>🔴 빨간색 토큰: $5</li>
+                        <li>🔵 파란색 토큰: $10</li>
+                        <li>🟢 초록색 토큰: $25</li>
+                        <li>⚫ 검은색 토큰: $100</li>
+                    </ul>
+
+                    <h3>3. AI 연습 게임 vs 멀티 대전</h3>
+                    <ul>
+                        <li><strong>AI 연습 모드:</strong> 플레이 데이터가 계정에 영향을 주지 않는 순수한 전술 연습을 지원합니다. AI는 플레이어의 카드를 맞추지 않습니다.</li>
+                        <li><strong>멀티플레이어 대전:</strong> 방장이 참가자 수(2~4명), 제한시간(10/15/20분), 참여 토큰비를 세팅하여 게임을 만듭니다. 인원이 가득 차면 실시간 데이터 통신을 통해 게임이 시작됩니다.</li>
+                    </ul>
+
+                    <h3>4. 게임 진행 및 시스템 정밀판정</h3>
+                    <p>모든 참가자는 1~10 사이 카드 3장을 골라 비밀리에 배치합니다. 각자 턴을 번갈아가며 지목한 적 카드를 수치를 입력해 추론하며, <strong>시스템이 직접 스트라이크와 볼 여부를 계산하여 오차 없이 중계</strong>합니다.</p>
+
+                    <h3>5. 힌트 요구 및 거절 / 경매 규칙</h3>
+                    <p>한 사람당 1회씩, 원하는 토큰 양을 걸어 상대에게 힌트를 요구합니다. 힌트는 정밀 자동 계산됩니다.</p>
+                    <ul>
+                        <li><strong>힌트 유형 3가지:</strong> 카드 3장의 합이 X 이상인지? / 홀수 카드의 총 개수 / 특정 슬롯의 카드가 X 이상인지?</li>
+                        <li><strong>거절 위자료:</strong> 지목당한 사람이 이를 거절하려면 <strong>질문자가 배팅한 액수만큼 똑같이 토큰을 페이백 지불</strong>해야 합니다. (이때 질문자의 찬스는 날아갑니다)</li>
+                        <li><strong>가로채기 (경매):</strong> 힌트의 응답은 질문자만 들을 수 있으나, 다른 제3자가 <strong>토큰을 더 많이 얹어 빼앗는 베팅</strong>을 시도할 수 있습니다. 경매 결과 최고 낙찰자만 힌트 답변을 독점합니다. (가로챈 유저는 1회 제한 찬스가 삭감되지 않습니다)</li>
+                    </ul>
+
+                    <h3>6. 쇼다운 선언 및 이탈자 정산</h3>
+                    <p>확신이 설 때 베팅 토큰을 걸고 쇼다운을 시전합니다. 정확히 맞추면 맞춘 대상에게 토큰을 빼앗아 가고 상대는 즉시 탈락합니다. 한 장이라도 어긋날 경우 배팅 토큰은 전부 중앙 풀에 기부되며 본인은 탈락합니다.</p>
+                    <p style="color: var(--accent-red); font-weight: bold;">⚠️ 방에 마지막 남은 최후 1인은 모든 대전 인원이 나가더라도 축적된 참가비 전액을 즉시 수령하며 게임이 자동 조기 폭파/종료됩니다.</p>
+                </div>
+            </div>
         </div>
     </div>
-
-    <!-- 힌트 가로채기 경매 & 거절 응답 전용 실시간 팝업창 -->
-    <div id="hintReactionArea" class="hidden" style="border: 2px solid var(--warning); padding:12px; border-radius:8px; margin-top:15px; background:#fffdf0;">
-        <h3 id="hintReactionTitle">📢 실시간 힌트 요청 알림</h3>
-        <p id="hintReactionText"></p>
-        <div style="display:flex; gap:10px;">
-            <button id="btnRejectHint" class="btn-danger">동일 토큰 내고 거절하기</button>
-            <button id="btnHijackHint" class="btn-secondary">토큰 추가 베팅하여 가로채기</button>
-            <button id="btnPassHint" class="btn-outline">패스 (그냥 정보 보게 둠)</button>
-        </div>
-    </div>
-
-    <!-- 게임 전용 전체 기록지 -->
-    <h3 style="text-align:left; margin-top:20px;">📜 이번 게임 실시간 기록 판</h3>
-    <div class="record-sheet" id="gameRecordSheet" style="height: 180px;"></div>
-    
-    <button id="btnLeaveGameRoom" class="btn-danger" style="margin-top:10px;">방 나가기 (자금 몰수)</button>
 </div>
 
-<!-- Firebase SDK 라이브러리 연동 -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, addDoc, onSnapshot, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<!-- [환전소 모달창] -->
+<div class="modal" id="modal-exchange">
+    <div class="modal-content">
+        <div class="card-title">🏦 EMB 토큰 환전 상점</div>
+        <p style="font-size: 13px; color: #718096; margin-bottom: 20px;">보유 달러로 게임 칩을 구매하거나, 축적된 토큰을 즉시 현물 달러 자금으로 소급 환전할 수 있습니다.</p>
+        <div class="token-exchange-grid">
+            <div class="token-item">
+                <span class="token-circle white-tok"></span><br><strong>$1</strong><br>
+                <button style="padding: 4px; font-size: 11px;" onclick="tradeToken('white', 1, true)">구매</button>
+                <button class="btn-secondary" style="padding: 4px; font-size: 11px;" onclick="tradeToken('white', 1, false)">판매</button>
+                <div style="font-size: 12px; margin-top:5px;">개수: <span id="cnt-white">0</span></div>
+            </div>
+            <div class="token-item">
+                <span class="token-circle pink-tok"></span><br><strong>$2</strong><br>
+                <button style="padding: 4px; font-size: 11px;" onclick="tradeToken('pink', 2, true)">구매</button>
+                <button class="btn-secondary" style="padding: 4px; font-size: 11px;" onclick="tradeToken('pink', 2, false)">판매</button>
+                <div style="font-size: 12px; margin-top:5px;">개수: <span id="cnt-pink">0</span></div>
+            </div>
+            <div class="token-item">
+                <span class="token-circle red-tok"></span><br><strong>$5</strong><br>
+                <button style="padding: 4px; font-size: 11px;" onclick="tradeToken('red', 5, true)">구매</button>
+                <button class="btn-secondary" style="padding: 4px; font-size: 11px;" onclick="tradeToken('red', 5, false)">판매</button>
+                <div style="font-size: 12px; margin-top:5px;">개수: <span id="cnt-red">0</span></div>
+            </div>
+            <div class="token-item">
+                <span class="token-circle blue-tok"></span><br><strong>$10</strong><br>
+                <button style="padding: 4px; font-size: 11px;" onclick="tradeToken('blue', 10, true)">구매</button>
+                <button class="btn-secondary" style="padding: 4px; font-size: 11px;" onclick="tradeToken('blue', 10, false)">판매</button>
+                <div style="font-size: 12px; margin-top:5px;">개수: <span id="cnt-blue">0</span></div>
+            </div>
+            <div class="token-item">
+                <span class="token-circle green-tok"></span><br><strong>$25</strong><br>
+                <button style="padding: 4px; font-size: 11px;" onclick="tradeToken('green', 25, true)">구매</button>
+                <button class="btn-secondary" style="padding: 4px; font-size: 11px;" onclick="tradeToken('green', 25, false)">판매</button>
+                <div style="font-size: 12px; margin-top:5px;">개수: <span id="cnt-green">0</span></div>
+            </div>
+            <div class="token-item">
+                <span class="token-circle black-tok"></span><br><strong>$100</strong><br>
+                <button style="padding: 4px; font-size: 11px;" onclick="tradeToken('black', 100, true)">구매</button>
+                <button class="btn-secondary" style="padding: 4px; font-size: 11px;" onclick="tradeToken('black', 100, false)">판매</button>
+                <div style="font-size: 12px; margin-top:5px;">개수: <span id="cnt-black">0</span></div>
+            </div>
+        </div>
+        <div style="text-align: right; margin-top: 15px;">
+            <button class="btn-secondary" onclick="closeExchangeModal()">닫기</button>
+        </div>
+    </div>
+</div>
 
-    // 파이어베이스 프로젝트 키 설정
+<!-- [서버 개설 모달창] -->
+<div class="modal" id="modal-server-create">
+    <div class="modal-content">
+        <div class="card-title">🌐 멀티플레이 대전 서버 설정</div>
+        <div class="form-group">
+            <label>참가 인원 설정 (2~4명)</label>
+            <select id="srv-max-players">
+                <option value="2">2명</option>
+                <option value="3">3명</option>
+                <option value="4">4명</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>진행 제한시간 선택</label>
+            <select id="srv-duration">
+                <option value="10">10분</option>
+                <option value="15">15분</option>
+                <option value="20">20분</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>기본 참가 배팅 토큰 금액 ($ 환산)</label>
+            <input type="number" id="srv-fee" value="50" min="1">
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+            <button class="btn-secondary" onclick="closeServerModal()">취소</button>
+            <button class="btn-accent" onclick="confirmServerCreation()">서버 생성 및 자산 차감</button>
+        </div>
+    </div>
+</div>
+
+<!-- [실시간 힌트 질문 및 경매 시뮬레이션 모달창] -->
+<div class="modal" id="modal-hint-auction">
+    <div class="modal-content">
+        <div class="card-title">💡 힌트 요구 및 가로채기 입찰</div>
+        <div class="form-group">
+            <label>1단계: 알고싶은 계산 질문 유형 선택</label>
+            <select id="hint-type" onchange="toggleHintInputs()">
+                <option value="sum">세 카드 숫자의 총합이 [?값] 이상이다</option>
+                <option value="odd">내 카드의 홀수 개수는 몇 개인가?</option>
+                <option value="specific">특정 칸의 카드가 [?값] 이상인가?</option>
+            </select>
+        </div>
+        <div class="form-group" id="hint-param-box">
+            <label id="hint-param-label">지정값 (?)</label>
+            <input type="number" id="hint-param-value" min="1" max="30" value="5">
+        </div>
+        <div class="form-group" id="hint-slot-box" style="display:none;">
+            <label>칸 선택</label>
+            <select id="hint-slot-index">
+                <option value="0">왼쪽</option>
+                <option value="1">가운데</option>
+                <option value="2">오른쪽</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>2단계: 제안할 배팅 토큰 규모 ($가치 기준)</label>
+            <input type="number" id="hint-token-bet" value="10" min="1">
+        </div>
+        <div style="border: 1.5px dashed var(--accent-gold); padding: 10px; border-radius:6px; margin-bottom:15px; font-size:12px;">
+            <strong>📢 시스템 중계:</strong> 힌트 요정 요구 시, 대상이 거절하기 위해서는 거절금(위자료)으로 내가 건 금액만큼을 돌려줘야 합니다. 다른 제3의 사용자들이 토큰을 상향 입찰(가로채기)하여 질문의 결과를 탈취할 수 있습니다!
+        </div>
+        <div style="display:flex; justify-content: space-between;">
+            <button class="btn-secondary" onclick="closeHintModal()">닫기</button>
+            <button onclick="processHintRequest()">힌트 요구 작동</button>
+        </div>
+    </div>
+</div>
+
+<!-- 파이어베이스 SDK 및 로직 통합 모듈 -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, set, update, runTransaction, onValue, off, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // ⚠️ [주의] 깃허브 배포 시 본인의 파이어베이스 고유 구성 정보를 아래 객체에 붙여넣으면 온전한 실시간 멀티플레이가 동기화됩니다!
     const firebaseConfig = {
-        apiKey: "AIzaSyAcEaCvwVQPU-3gCc1P_MhAYsZofq60g_o",
-        authDomain: "math-0715.firebaseapp.com",
-        projectId: "math-0715",
-        storageBucket: "math-0715.firebasestorage.app",
-        messagingSenderId: "725297586702",
-        appId: "1:725297586702:web:2412b0e723e1228bf8525f"
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
+    // 초기화 변수 선언
+    let app, auth, db;
+    let isFirebaseConnected = false;
 
-    let currentUser = null;
-    let userData = null;
-    let aiSecretCards = [];
+    // 만약 파이어베이스 정보가 디폴트일 시 로컬 샌드박스로 가상 시뮬레이션 지원하도록 예외 안전 처리
+    try {
+        if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getDatabase(app);
+            isFirebaseConnected = true;
+            console.log("Firebase Database 연동 성공.");
+        } else {
+            console.warn("기본 Firebase Config 상태입니다. 로컬 프론트엔드 모의 시뮬레이터로 자동 변환하여 구동합니다.");
+        }
+    } catch (e) {
+        console.error("Firebase 로딩 실패, 로컬 샌드박스로 시작합니다.", e);
+    }
+
+    /* ========================================================
+     * [글로벌 게임 라이프사이클 변수]
+     * ======================================================== */
+    let myDollarBalance = 500;
+    let myNickname = "";
+    let myTokens = { white: 0, pink: 0, red: 0, blue: 0, green: 0, black: 0 };
+    let selectedSetupCards = [];
     
-    // 멀티플레이어 게임 전용 변수들
-    let activeRoomId = null;
-    let roomUnsubscribe = null;
-    let myCardsSet = false;
+    // 게임 내부 데이터
+    let currentGameMode = "AI"; // "AI" or "MULTIPLAYER"
+    let aiTargetCards = [];
+    let playerSetupCards = [];
+    let gameTimerInterval = null;
+    let secondsLeft = 600;
+    let prizePool = 0;
+    let matchHistoryLog = [];
 
-    // 화면 컨트롤러 함수
-    function showScreen(screenId) {
-        document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
-        document.getElementById(screenId).classList.remove('hidden');
-    }
+    window.onload = function() {
+        renderCardChoices();
+        updateTokenCounters();
+    };
 
-    // --- 1. 이화여고 전용 로그인 시스템 ---
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-        try {
-            const result = await signInWithPopup(auth, provider);
-            currentUser = result.user;
-            
-            if (!currentUser.email.endsWith('@ewha.hs.kr')) {
-                alert("로그인 실패: 이화여고 계정(@ewha.hs.kr)으로만 플레이할 수 있습니다.");
-                await signOut(auth);
-                return;
-            }
+    /* ========================================================
+     * [인증 모듈] 도메인 엄격 확인 및 중복 검증
+     * ======================================================== */
+    document.getElementById("btn-submit-auth").addEventListener("click", async () => {
+        const email = document.getElementById("auth-email").value.trim();
+        const password = document.getElementById("auth-password").value;
 
-            const userRef = doc(db, "users", currentUser.email);
-            const userSnap = await getDoc(userRef);
-
-            if (userSnap.exists()) {
-                userData = userSnap.data();
-                updateLobbyInfo();
-                showScreen('modeSelectScreen');
-            } else {
-                showScreen('nicknameScreen');
-            }
-        } catch (err) {
-            console.error(err);
-            alert("이화여고 로그인 연동 에러가 발생했습니다.");
-        }
-    });
-
-    // --- 2. 닉네임 유일 등록 절차 ---
-    document.getElementById('checkNicknameBtn').addEventListener('click', async () => {
-        const nick = document.getElementById('nicknameInput').value.trim();
-        if (nick.length < 2 || nick.length > 10) return alert("닉네임은 2글자에서 10글자 사이여야 합니다.");
-
-        // 중복 가입 체크
-        const q = query(collection(db, "users"), where("nickname", "==", nick));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-            return alert("이미 존재하는 중복 닉네임입니다! 다른 이름을 적어주세요.");
-        }
-
-        await setDoc(doc(db, "users", currentUser.email), {
-            email: currentUser.email,
-            nickname: nick,
-            money: 500, // 기획서 지급 규칙 적용
-            createdAt: serverTimestamp()
-        });
-
-        userData = { nickname: nick, money: 500 };
-        updateLobbyInfo();
-        alert("성공적으로 가입되었습니다! 기본 지원금 $500가 충전되었습니다.");
-        showScreen('modeSelectScreen');
-    });
-
-    function updateLobbyInfo() {
-        document.getElementById('userInfoDisplay').innerHTML = `
-            <span>👤 <b>${userData.nickname}</b>님 환영합니다!</span><br>
-            <span style="font-size:16px;">💰 보유 중인 달러 자산: <b>$${userData.money}</b></span>
-        `;
-    }
-
-    // --- 3. 로비 이동 관리 ---
-    document.getElementById('btnExchange').addEventListener('click', () => showScreen('exchangeScreen'));
-    document.getElementById('btnExitExchange').addEventListener('click', () => showScreen('modeSelectScreen'));
-    document.getElementById('btnLogOut').addEventListener('click', async () => {
-        await signOut(auth);
-        location.reload();
-    });
-
-    // --- 4. AI 연습게임 완전 가동 ---
-    document.getElementById('btnAiMode').addEventListener('click', () => {
-        startAiGame();
-        showScreen('aiGameScreen');
-    });
-
-    document.getElementById('btnExitAiMode').addEventListener('click', () => {
-        if(confirm("연습을 종료하고 로비로 돌아가시겠습니까?")) {
-            showScreen('modeSelectScreen');
-        }
-    });
-
-    function startAiGame() {
-        let list = [1,2,3,4,5,6,7,8,9,10];
-        aiSecretCards = [];
-        for(let i=0; i<3; i++) {
-            let idx = Math.floor(Math.random() * list.length);
-            aiSecretCards.push(list[idx]);
-            list.splice(idx, 1);
-        }
-        document.getElementById('aiRecordSheet').innerHTML = "<div class='record-item'>🔒 AI가 카드를 배치했습니다. 추측 입력을 시작하세요!</div>";
-    }
-
-    document.getElementById('btnSubmitAiGuess').addEventListener('click', () => {
-        const g1 = parseInt(document.getElementById('aiGuess1').value);
-        const g2 = parseInt(document.getElementById('aiGuess2').value);
-        const g3 = parseInt(document.getElementById('aiGuess3').value);
-
-        if(!g1 || !g2 || !g3 || g1<1 || g1>10 || g2<1 || g2>10 || g3<1 || g3>10) {
-            return alert("1~10 숫자 카드를 빈칸 없이 입력해주세요.");
-        }
-        if((new Set([g1,g2,g3])).size !== 3) return alert("중복된 카드를 놓을 수 없습니다.");
-
-        let s = 0, b = 0;
-        const gArr = [g1, g2, g3];
-        for(let i=0; i<3; i++) {
-            if(gArr[i] === aiSecretCards[i]) s++;
-            else if(aiSecretCards.includes(gArr[i])) b++;
-        }
-
-        const log = `입력: [${g1}, ${g2}, ${g3}] ➔ <span class="badge" style="background:#3498db; color:white;">${s}S ${b}B</span>`;
-        document.getElementById('aiRecordSheet').innerHTML += `<div class='record-item'>${log}</div>`;
-        
-        if(s === 3) {
-            alert(`🎉 완벽합니다! AI의 카드 [${aiSecretCards.join(', ')}]를 완전히 간파하셨습니다!`);
-            showScreen('modeSelectScreen');
-        }
-    });
-
-
-    // --- 5. 실시간 멀티플레이 로비 & 매칭 시스템 ---
-    document.getElementById('btnMultiMode').addEventListener('click', () => {
-        showScreen('multiplayerScreen');
-        listenRooms();
-    });
-
-    document.getElementById('btnBackToMode').addEventListener('click', () => showScreen('modeSelectScreen'));
-    document.getElementById('btnShowCreateRoom').addEventListener('click', () => showScreen('createRoomScreen'));
-    document.getElementById('btnCancelCreate').addEventListener('click', () => showScreen('multiplayerScreen'));
-
-    // 방 리스트 동적 실시간 감지
-    function listenRooms() {
-        const q = query(collection(db, "rooms"), where("status", "==", "waiting"));
-        onSnapshot(q, (snap) => {
-            const listDiv = document.getElementById('roomList');
-            listDiv.innerHTML = "";
-            if (snap.empty) {
-                listDiv.innerHTML = "<p style='color:#777;'>개설된 대기방이 없습니다. 방을 만들어 시작하세요!</p>";
-                return;
-            }
-            snap.forEach(docSnap => {
-                const room = docSnap.data();
-                const rid = docSnap.id;
-                
-                const div = document.createElement('div');
-                div.className = 'room-item';
-                div.innerHTML = `
-                    <p>👑 <b>${room.host}'s Server</b></p>
-                    <p>👥 인원 제한: ${room.currentPlayers}/${room.maxPlayers}명 | ⏱ 제한시간: ${room.timeLimit}분</p>
-                    <p>💰 기본 판돈 토큰: <span class="highlight">$${room.entryFee}</span></p>
-                    <button class="room-join-btn btn-secondary" onclick="joinRoom('${rid}', ${room.entryFee})">참여하기</button>
-                `;
-                listDiv.appendChild(div);
-            });
-        });
-    }
-
-    // 신규 방 DB 개설
-    document.getElementById('btnCreateRoomSubmit').addEventListener('click', async () => {
-        const maxP = parseInt(document.getElementById('roomPlayers').value);
-        const time = parseInt(document.getElementById('roomTime').value);
-        const fee = parseInt(document.getElementById('roomFee').value);
-
-        if (userData.money < fee) {
-            return alert("잔액이 부족하여 이 참가비 토큰의 방을 개설할 수 없습니다.");
-        }
-
-        const roomData = {
-            host: userData.nickname,
-            maxPlayers: maxP,
-            currentPlayers: 1,
-            timeLimit: time,
-            entryFee: fee,
-            status: "waiting",
-            playersList: [userData.nickname],
-            playerMoneys: { [userData.nickname]: userData.money - fee },
-            playerStatus: { [userData.nickname]: "idle" },
-            playerSecrets: {}, 
-            pot: fee,
-            turnIndex: 0,
-            log: ["🎮 방이 생성되었습니다. 수비 카드를 설정해 주세요."],
-            activeHint: null,
-            createdAt: serverTimestamp()
-        };
-
-        const docRef = await addDoc(collection(db, "rooms"), roomData);
-        activeRoomId = docRef.id;
-        
-        // 지갑에서 선 차감
-        userData.money -= fee;
-        await updateDoc(doc(db, "users", currentUser.email), { money: userData.money });
-
-        enterRoom(activeRoomId);
-    });
-
-    // 방 직접 참여 함수
-    window.joinRoom = async function(roomId, entryFee) {
-        if(userData.money < entryFee) {
-            return alert("참가 토큰비가 부족하여 들어갈 수 없습니다.");
-        }
-
-        const rRef = doc(db, "rooms", roomId);
-        const snap = await getDoc(rRef);
-        if(!snap.exists()) return;
-        const room = snap.data();
-
-        if (room.playersList.includes(userData.nickname)) {
-            enterRoom(roomId);
+        // 1. 도메인 체크 패턴 확인
+        if (!email.endsWith("@ewha.hs.kr")) {
+            alert("❌ 학교 계정 오류: 오직 @ewha.hs.kr 도메인 소유 학생만 입장이 가능합니다.");
             return;
         }
 
-        if (room.currentPlayers >= room.maxPlayers) {
-            return alert("이미 자리가 꽉 찬 방입니다.");
+        if (password.length < 6) {
+            alert("🔑 패스워드는 안전상 6자리 이상이어야 가입/동기화됩니다.");
+            return;
         }
 
-        const updatedList = [...room.playersList, userData.nickname];
-        const newMoneys = { ...room.playerMoneys, [userData.nickname]: userData.money - entryFee };
-        const newStatus = { ...room.playerStatus, [userData.nickname]: "idle" };
+        if (isFirebaseConnected) {
+            try {
+                const userCred = await signInWithEmailAndPassword(auth, email, password);
+                handleLoginSuccess(userCred.user.uid);
+            } catch (err) {
+                if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                    try {
+                        const newCred = await createUserWithEmailAndPassword(auth, email, password);
+                        await set(ref(db, `users/${newCred.user.uid}`), {
+                            email: email,
+                            dollarBalance: 500,
+                            nickname: "",
+                            wins: 0
+                        });
+                        alert("🎉 이화고 가입을 축하합니다! 초기 정착금 $500를 보냈습니다.");
+                        handleLoginSuccess(newCred.user.uid);
+                    } catch (signUpErr) {
+                        alert("가입 중 에러: " + signUpErr.message);
+                    }
+                } else {
+                    alert("인증 오류: " + err.message);
+                }
+            }
+        } else {
+            // 로컬 샌드박스 가상 유저 패스
+            alert("💡 로컬 샌드박스로 로그인 처리되었습니다. (클라이언트 테스트 모드)");
+            myNickname = email.split('@')[0];
+            document.getElementById("view-auth").style.display = "none";
+            document.getElementById("view-lobby").style.display = "grid";
+            document.getElementById("lbl-nickname").innerText = myNickname;
+            document.getElementById("lbl-balance").innerText = `$${myDollarBalance}`;
+        }
+    });
 
-        await updateDoc(rRef, {
-            playersList: updatedList,
-            currentPlayers: updatedList.length,
-            playerMoneys: newMoneys,
-            playerStatus: newStatus,
-            pot: room.pot + entryFee,
-            log: [...room.log, `🔔 ${userData.nickname}님이 참가비 $${entryFee}를 내고 들어왔습니다.` ]
+    function handleLoginSuccess(uid) {
+        onValue(ref(db, `users/${uid}`), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                myDollarBalance = data.dollarBalance || 500;
+                document.getElementById("lbl-balance").innerText = `$${myDollarBalance}`;
+                
+                if (!data.nickname) {
+                    document.getElementById("view-auth").style.display = "none";
+                    document.getElementById("view-nickname").style.display = "block";
+                } else {
+                    myNickname = data.nickname;
+                    document.getElementById("lbl-nickname").innerText = myNickname;
+                    document.getElementById("view-auth").style.display = "none";
+                    document.getElementById("view-nickname").style.display = "none";
+                    document.getElementById("view-lobby").style.display = "grid";
+                    loadMultiplayerServers();
+                }
+            }
         });
+    }
 
-        userData.money -= entryFee;
-        await updateDoc(doc(db, "users", currentUser.email), { money: userData.money });
+    document.getElementById("btn-submit-nickname").addEventListener("click", async () => {
+        const nickname = document.getElementById("reg-nickname").value.trim();
+        if (!nickname) return alert("올바른 별칭을 입력하십시오.");
 
-        enterRoom(roomId);
+        if (isFirebaseConnected) {
+            const nickRef = ref(db, `nicknames/${nickname}`);
+            const userRef = ref(db, `users/${auth.currentUser.uid}`);
+
+            try {
+                const check = await runTransaction(nickRef, (curr) => {
+                    if (curr === null) return auth.currentUser.uid;
+                    return undefined;
+                });
+
+                if (check.committed) {
+                    await update(userRef, { nickname: nickname });
+                } else {
+                    alert("이미 학교 내 다른 학생이 사용 중인 닉네임입니다.");
+                }
+            } catch (err) {
+                alert("트랜잭션 오류: " + err.message);
+            }
+        } else {
+            myNickname = nickname;
+            document.getElementById("lbl-nickname").innerText = myNickname;
+            document.getElementById("view-nickname").style.display = "none";
+            document.getElementById("view-lobby").style.display = "grid";
+        }
+    });
+
+
+    /* ========================================================
+     * [환전 상점 모듈] 달러 <-> 6개 토큰 양방향 완벽 동기화
+     * ======================================================== */
+    window.openExchangeModal = function() {
+        document.getElementById("modal-exchange").style.display = "flex";
     };
 
-    // 실시간 멀티플레이 게임 연동 세션
-    function enterRoom(roomId) {
-        activeRoomId = roomId;
-        myCardsSet = false;
-        showScreen('activeGameScreen');
+    window.closeExchangeModal = function() {
+        document.getElementById("modal-exchange").style.display = "none";
+    };
 
-        document.getElementById('cardSetupArea').classList.remove('hidden');
-        document.getElementById('actionArea').classList.add('hidden');
-        document.getElementById('hintReactionArea').classList.add('hidden');
-
-        if(roomUnsubscribe) roomUnsubscribe();
-
-        roomUnsubscribe = onSnapshot(doc(db, "rooms", roomId), (snap) => {
-            if(!snap.exists()) {
-                alert("서버방이 닫혔거나 나갔습니다.");
-                exitToLobby();
+    window.tradeToken = async function(type, value, isBuy) {
+        if (isBuy) {
+            if (myDollarBalance < value) {
+                alert("❌ 보유하신 달러 자산이 충분하지 않습니다.");
                 return;
             }
-            const room = snap.data();
-            renderActiveGame(room);
-        });
-    }
-
-    // 실시간 멀티방 내부 상황 그리기
-    function renderActiveGame(room) {
-        document.getElementById('gameRoomTitle').innerText = `🎮 ${room.host}님의 게임서버`;
-        document.getElementById('gameTotalPot').innerText = `💰 총 상금 팟: $${room.pot}`;
-        
-        // 기록판 출력
-        const logPanel = document.getElementById('gameRecordSheet');
-        logPanel.innerHTML = room.log.map(l => `<div class='record-item'>${l}</div>`).join('');
-        logPanel.scrollTop = logPanel.scrollHeight;
-
-        // 플레이어 리스트 현황 출력
-        const pListDiv = document.getElementById('playerStatusList');
-        pListDiv.innerHTML = room.playersList.map(p => {
-            const isMyTurn = room.playersList[room.turnIndex] === p;
-            const statusTag = isMyTurn ? "<span class='badge' style='background:red;'>공격 차례</span>" : "<span class='badge'>수비중</span>";
-            const cardsReady = room.playerSecrets[p] ? "✅ 세팅완료" : "❌ 배치중";
-            return `<div style='padding:5px 0;'>👤 <b>${p}</b> (${cardsReady}) | 보유금: $${room.playerMoneys[p] || 0} ${statusTag}</div>`;
-        }).join('');
-
-        // 모든 사용자가 카드 수비 배치 완료 시 실전 턴 실행
-        const allReady = room.playersList.every(p => room.playerSecrets[p] !== undefined);
-        
-        if (allReady) {
-            document.getElementById('cardSetupArea').classList.add('hidden');
-            const turnPlayer = room.playersList[room.turnIndex];
-            document.getElementById('turnStatus').innerText = `현재 [${turnPlayer}] 차례`;
-
-            if (turnPlayer === userData.nickname) {
-                document.getElementById('actionArea').classList.remove('hidden');
-                // 지목대상 드롭다운 채우기
-                const targetSelect = document.getElementById('targetPlayerSelect');
-                targetSelect.innerHTML = room.playersList
-                    .filter(p => p !== userData.nickname)
-                    .map(p => `<option value="${p}">${p}</option>`).join('');
-            } else {
-                document.getElementById('actionArea').classList.add('hidden');
+            myDollarBalance -= value;
+            myTokens[type] += 1;
+        } else {
+            if (myTokens[type] <= 0) {
+                alert("❌ 매각하려는 종류의 토큰을 가지고 있지 않습니다.");
+                return;
             }
-        } else {
-            document.getElementById('turnStatus').innerText = `수비수 카드 배치 진행 중...`;
+            myDollarBalance += value;
+            myTokens[type] -= 1;
         }
 
-        // 실시간 힌트 경매 팝업 체크
-        if (room.activeHint) {
-            const h = room.activeHint;
-            if (h.target === userData.nickname && h.state === "pending") {
-                // 내 카드에 힌트를 물어봤을때 -> 거절 혹은 대기
-                document.getElementById('hintReactionArea').classList.remove('hidden');
-                document.getElementById('hintReactionTitle').innerText = "💡 힌트 질문 도달!";
-                document.getElementById('hintReactionText').innerText = `[${h.requester}]님이 $${h.bet}을 걸고 힌트(${h.type})를 요구했습니다. 거절하려면 동일한 $${h.bet} 토큰을 제출해야 합니다!`;
-            } else if (h.state === "hijack" && h.requester !== userData.nickname && h.target !== userData.nickname) {
-                // 다른사람이 답변 가로채기(경매) 경쟁 중일 때
-                document.getElementById('hintReactionArea').classList.remove('hidden');
-                document.getElementById('hintReactionTitle').innerText = "⚖️ 힌트 가로채기 경매 진행중!";
-                document.getElementById('hintReactionText').innerText = `현재 최고 가로채기 입찰금: $${h.highestBet} (입찰자: ${h.highestBidder})`;
-            } else {
-                document.getElementById('hintReactionArea').classList.add('hidden');
-            }
-        } else {
-            document.getElementById('hintReactionArea').classList.add('hidden');
-        }
-    }
-
-    // 내 수비 카드 등록 (게임 개시 시 단 한 번 실행)
-    document.getElementById('btnConfirmSetup').addEventListener('click', async () => {
-        const c1 = parseInt(document.getElementById('setupCard1').value);
-        const c2 = parseInt(document.getElementById('setupCard2').value);
-        const c3 = parseInt(document.getElementById('setupCard3').value);
-
-        if(!c1 || !c2 || !c3 || c1<1 || c1>10 || c2<1 || c2>10 || c3<1 || c3>10) {
-            return alert("수비용 3자리 숫자를 빈틈없이 1~10에서 골라주세요.");
-        }
-        if((new Set([c1,c2,c3])).size !== 3) return alert("중복 카드는 둘 수 없습니다.");
-
-        const rRef = doc(db, "rooms", activeRoomId);
-        const snap = await getDoc(rRef);
-        const room = snap.data();
-
-        const secrets = { ...room.playerSecrets, [userData.nickname]: [c1, c2, c3] };
-        
-        await updateDoc(rRef, {
-            playerSecrets: secrets,
-            log: [...room.log, `✔ [${userData.nickname}] 수비 카드 배치 확정.`]
-        });
-
-        document.getElementById('cardSetupArea').classList.add('hidden');
-        alert("내 카드가 성공적으로 안전하게 잠겼습니다!");
-    });
-
-    // 공격 옵션 3종 제어 토글
-    document.getElementById('btnActionGuess').addEventListener('click', () => {
-        document.getElementById('subFormGuess').classList.remove('hidden');
-        document.getElementById('subFormHint').classList.add('hidden');
-    });
-    document.getElementById('btnActionHint').addEventListener('click', () => {
-        document.getElementById('subFormHint').classList.remove('hidden');
-        document.getElementById('subFormGuess').classList.add('hidden');
-    });
-
-    // 1) 일반 예측 공격 실행
-    document.getElementById('btnSubmitGuess').addEventListener('click', async () => {
-        const target = document.getElementById('targetPlayerSelect').value;
-        const g1 = parseInt(document.getElementById('guessVal1').value);
-        const g2 = parseInt(document.getElementById('guessVal2').value);
-        const g3 = parseInt(document.getElementById('guessVal3').value);
-
-        if(!g1 || !g2 || !g3) return alert("숫자카드를 채워주세요.");
-
-        const rRef = doc(db, "rooms", activeRoomId);
-        const snap = await getDoc(rRef);
-        const room = snap.data();
-
-        const targetSecrets = room.playerSecrets[target];
-        let s=0, b=0;
-        const gArr = [g1, g2, g3];
-        for(let i=0; i<3; i++) {
-            if(gArr[i] === targetSecrets[i]) s++;
-            else if(targetSecrets.includes(gArr[i])) b++;
-        }
-
-        const resultLog = `🎯 [${userData.nickname}]의 추측 ➔ [${target}]에 대해 [${g1}, ${g2}, ${g3}] 결과: ${s} 스트라이크 ${b} 볼`;
-        const nextIndex = (room.turnIndex + 1) % room.playersList.length;
-
-        await updateDoc(rRef, {
-            turnIndex: nextIndex,
-            log: [...room.log, resultLog]
-        });
-
-        document.getElementById('subFormGuess').classList.add('hidden');
-    });
-
-    // 2) 힌트 토큰 베팅 요구 전송
-    document.getElementById('btnSubmitHint').addEventListener('click', async () => {
-        const target = document.getElementById('targetPlayerSelect').value;
-        const type = document.getElementById('hintType').value;
-        const queryVal = parseInt(document.getElementById('hintQueryVal').value) || 0;
-        const bet = parseInt(document.getElementById('hintBetAmount').value);
-
-        if (!bet || bet <= 0) return alert("정확한 베팅 금액 토큰을 설정해주세요.");
-        if (userData.money < bet) return alert("보유 토큰 잔액이 부족합니다.");
-
-        const rRef = doc(db, "rooms", activeRoomId);
-        const snap = await getDoc(rRef);
-        const room = snap.data();
-
-        // 임시 힌트 락 세팅
-        const hintObj = {
-            requester: userData.nickname,
-            target: target,
-            type: type,
-            queryVal: queryVal,
-            bet: bet,
-            highestBet: bet,
-            highestBidder: userData.nickname,
-            state: "pending"
-        };
-
-        await updateDoc(rRef, {
-            activeHint: hintObj,
-            log: [...room.log, `💡 [${userData.nickname}]님이 [${target}]에게 $${bet} 토큰을 걸고 힌트를 요구함.`]
-        });
-
-        document.getElementById('subFormHint').classList.add('hidden');
-    });
-
-    // 3) 죽음의 쇼다운 승부수 선언
-    document.getElementById('btnActionShowdown').addEventListener('click', async () => {
-        const target = document.getElementById('targetPlayerSelect').value;
-        const g1 = prompt(`${target}의 첫번째 카드는? (1~10)`);
-        const g2 = prompt(`${target}의 두번째 카드는? (1~10)`);
-        const g3 = prompt(`${target}의 세번째 카드는? (1~10)`);
-
-        if(!g1 || !g2 || !g3) return;
-
-        const rRef = doc(db, "rooms", activeRoomId);
-        const snap = await getDoc(rRef);
-        const room = snap.data();
-
-        const real = room.playerSecrets[target];
-        const win = (parseInt(g1)===real[0] && parseInt(g2)===real[1] && parseInt(g3)===real[2]);
-
-        let logMsg = "";
-        let newPlayers = [...room.playersList];
-        let nextIdx = room.turnIndex;
-
-        if (win) {
-            logMsg = `🔥 [쇼다운 성공!!] [${userData.nickname}]님이 [${target}]의 카드 [${real.join(', ')}]를 완벽 격파! [${target}] 탈락!`;
-            newPlayers = newPlayers.filter(p => p !== target);
-        } else {
-            logMsg = `💀 [쇼다운 실패!!] [${userData.nickname}]님의 억측 실패! 카드 공개 후 [${userData.nickname}] 강제 자금 몰수 및 즉시 탈락!`;
-            newPlayers = newPlayers.filter(p => p !== userData.nickname);
-        }
-
-        if(newPlayers.length <= 1) {
-            logMsg += `\n🏆 최종 승자가 결정되었습니다! 모든 참가비 독식!`;
-            // 최종 승자 잔고 원상복구 로직
-            const winner = newPlayers[0] || room.playersList[0];
-            if(winner === userData.nickname) {
-                userData.money += room.pot;
-                await updateDoc(doc(db, "users", currentUser.email), { money: userData.money });
-            }
-            await deleteDoc(rRef);
-            alert(logMsg);
-            exitToLobby();
-        } else {
-            nextIdx = nextIdx % newPlayers.length;
-            await updateDoc(rRef, {
-                playersList: newPlayers,
-                turnIndex: nextIdx,
-                log: [...room.log, logMsg]
+        // 실시간 연동 업데이트
+        if (isFirebaseConnected && auth.currentUser) {
+            await update(ref(db, `users/${auth.currentUser.uid}`), {
+                dollarBalance: myDollarBalance
             });
         }
-    });
-
-    // 힌트 반응 버튼 이벤트
-    document.getElementById('btnRejectHint').addEventListener('click', async () => {
-        const rRef = doc(db, "rooms", activeRoomId);
-        const snap = await getDoc(rRef);
-        const room = snap.data();
-        const h = room.activeHint;
-
-        if(userData.money < h.bet) return alert("자금이 부족해 거절비를 낼 수 없습니다! (강제 수락)");
-
-        // 거절 로직: 거절당할 시 내가 낸 거절비 토큰만큼을 요구자에게 전달, 힌트기회 소멸
-        userData.money -= h.bet;
-        const reqUserSnap = await getDoc(doc(db, "users", currentUser.email)); // 실보유금 연동
-
-        await updateDoc(rRef, {
-            activeHint: null,
-            log: [...room.log, `❌ [${userData.nickname}]님이 동일 $${h.bet}을 걸고 제안을 거절했습니다. 질문자의 기회가 영구 소멸됩니다.` ]
-        });
-
-        alert(`거절 완료! 상대가 올린 토큰 $${h.bet}을 획득하였습니다.`);
-    });
-
-    document.getElementById('btnHijackHint').addEventListener('click', async () => {
-        const addBet = parseInt(prompt("현재 최고 낙찰금보다 더 높게 걸 토큰 액수를 적으세요 ($)"));
-        if(!addBet) return;
-
-        const rRef = doc(db, "rooms", activeRoomId);
-        const snap = await getDoc(rRef);
-        const room = snap.data();
-        const h = room.activeHint;
-
-        if(addBet <= h.highestBet) return alert("현재 최고 입찰금보다 커야 가로챌 수 있습니다.");
-        if(userData.money < addBet) return alert("보유한 토큰 자금이 부족합니다.");
-
-        await updateDoc(rRef, {
-            "activeHint.highestBet": addBet,
-            "activeHint.highestBidder": userData.nickname,
-            "activeHint.state": "hijack",
-            log: [...room.log, `⚖️ [${userData.nickname}]님이 더 높은 $${addBet}으로 힌트정보 경매 가로채기를 시도합니다.`]
-        });
-    });
-
-    document.getElementById('btnPassHint').addEventListener('click', async () => {
-        const rRef = doc(db, "rooms", activeRoomId);
-        const snap = await getDoc(rRef);
-        const room = snap.data();
-        const h = room.activeHint;
-
-        // 경매 마감 처리 및 기획서 힌트 공식 자동 대입
-        const targetSecrets = room.playerSecrets[h.target];
-        let answer = "";
         
-        if(h.type === "sum") {
-            const sum = targetSecrets[0] + targetSecrets[1] + targetSecrets[2];
-            answer = `세 카드 합이 ${h.queryVal} 이상인가? ➔ ${sum >= h.queryVal ? "참 (YES)" : "거짓 (NO)"}`;
-        } else if(h.type === "odd") {
-            const odds = targetSecrets.filter(n => n % 2 !== 0).length;
-            answer = `홀수 카드의 개수 ➔ 총 ${odds}개`;
-        } else if(h.type === "over") {
-            answer = `첫번째 칸 카드가 ${h.queryVal} 이상인가? ➔ ${targetSecrets[0] >= h.queryVal ? "YES" : "NO"}`;
+        document.getElementById("lbl-balance").innerText = `$${myDollarBalance}`;
+        updateTokenCounters();
+    };
+
+    function updateTokenCounters() {
+        document.getElementById("cnt-white").innerText = myTokens.white;
+        document.getElementById("cnt-pink").innerText = myTokens.pink;
+        document.getElementById("cnt-red").innerText = myTokens.red;
+        document.getElementById("cnt-blue").innerText = myTokens.blue;
+        document.getElementById("cnt-green").innerText = myTokens.green;
+        document.getElementById("cnt-black").innerText = myTokens.black;
+    }
+
+    function calculateTotalTokenValue() {
+        return (myTokens.white * 1) + 
+               (myTokens.pink * 2) + 
+               (myTokens.red * 5) + 
+               (myTokens.blue * 10) + 
+               (myTokens.green * 25) + 
+               (myTokens.black * 100);
+    }
+
+    function autoDeductTokens(targetValue) {
+        // 배팅 시 자동으로 토큰들을 높은 가치 순서대로 차감
+        let accumulated = 0;
+        const types = [
+            { name: "black", val: 100 },
+            { name: "green", val: 25 },
+            { name: "blue", val: 10 },
+            { name: "red", val: 5 },
+            { name: "pink", val: 2 },
+            { name: "white", val: 1 }
+        ];
+
+        let testTokens = { ...myTokens };
+        for (let t of types) {
+            while (testTokens[t.name] > 0 && targetValue - accumulated >= t.val) {
+                testTokens[t.name]--;
+                accumulated += t.val;
+            }
         }
 
-        await updateDoc(rRef, {
-            activeHint: null,
-            log: [...room.log, `📢 [힌트 공개] (수신자: ${h.highestBidder}) ➔ ${answer}`]
+        if (accumulated < targetValue) {
+            // 잔돈을 바꿔서라도 채워야 할 경우 처리
+            const totalVal = calculateTotalTokenValue();
+            if (totalVal >= targetValue) {
+                // 단순화 환산 처리
+                let remains = totalVal - targetValue;
+                myTokens = { white: remains, pink: 0, red: 0, blue: 0, green: 0, black: 0 };
+                updateTokenCounters();
+                return true;
+            }
+            return false;
+        }
+
+        myTokens = testTokens;
+        updateTokenCounters();
+        return true;
+    }
+
+
+    /* ========================================================
+     * [AI 연습 모드 시스템]
+     * ======================================================== */
+    window.startAiGame = function() {
+        currentGameMode = "AI";
+        document.getElementById("game-title").innerText = "🤖 AI 연습 게임판";
+        document.getElementById("lobby-modes").style.display = "none";
+        document.getElementById("game-active-area").style.display = "block";
+        document.getElementById("game-setup-phase").style.display = "block";
+        document.getElementById("game-play-phase").style.display = "none";
+        
+        // AI 카드 난수 3장 생성 (중복 없이 1~10)
+        aiTargetCards = [];
+        while (aiTargetCards.length < 3) {
+            let r = Math.floor(Math.random() * 10) + 1;
+            if (!aiTargetCards.includes(r)) aiTargetCards.push(r);
+        }
+
+        selectedSetupCards = [];
+        resetCardChoiceUI();
+        logToBoard("[시스템] AI가 카드를 생성하고 준비했습니다. 내 카드를 고르세요.");
+    };
+
+
+    /* ========================================================
+     * [카드 선택 및 조립 컴포넌트]
+     * ======================================================== */
+    function renderCardChoices() {
+        const pool = document.getElementById("card-choice-pool");
+        pool.innerHTML = "";
+        for (let i = 1; i <= 10; i++) {
+            const btn = document.createElement("button");
+            btn.className = "card-choice-btn";
+            btn.innerText = i;
+            btn.onclick = () => selectCard(i, btn);
+            pool.appendChild(btn);
+        }
+    }
+
+    function selectCard(num, element) {
+        if (selectedSetupCards.includes(num)) {
+            selectedSetupCards = selectedSetupCards.filter(x => x !== num);
+            element.classList.remove("selected");
+        } else {
+            if (selectedSetupCards.length >= 3) {
+                alert("카드 배치는 최대 3개까지만 가능합니다.");
+                return;
+            }
+            selectedSetupCards.push(num);
+            element.classList.add("selected");
+        }
+        updateCardSlots();
+    }
+
+    function updateCardSlots() {
+        document.getElementById("slot-left").innerText = selectedSetupCards[0] || "왼쪽";
+        document.getElementById("slot-mid").innerText = selectedSetupCards[1] || "가운데";
+        document.getElementById("slot-right").innerText = selectedSetupCards[2] || "오른쪽";
+    }
+
+    function resetCardChoiceUI() {
+        selectedSetupCards = [];
+        updateCardSlots();
+        const btns = document.querySelectorAll(".card-choice-btn");
+        btns.forEach(b => b.classList.remove("selected"));
+    }
+
+    window.confirmCardSetup = function() {
+        if (selectedSetupCards.length < 3) {
+            alert("세 칸에 카드를 모두 올리셔야 합니다.");
+            return;
+        }
+        playerSetupCards = [...selectedSetupCards];
+        document.getElementById("game-setup-phase").style.display = "none";
+        document.getElementById("game-play-phase").style.display = "block";
+        
+        logToBoard("[시스템] 배치 완료! 추측 공격을 투입하십시오.");
+        startTimer(10);
+    };
+
+
+    /* ========================================================
+     * [공격 전개 및 시스템 자동 야구판정 엔진]
+     * ======================================================== */
+    window.submitPlayerGuess = function() {
+        const gl = parseInt(document.getElementById("guess-l").value);
+        const gm = parseInt(document.getElementById("guess-m").value);
+        const gr = parseInt(document.getElementById("guess-r").value);
+
+        if (isNaN(gl) || isNaN(gm) || isNaN(gr)) {
+            alert("공격 필드를 모두 적어 주십시오.");
+            return;
+        }
+
+        const guessArray = [gl, gm, gr];
+        let target = aiTargetCards; // 멀티 시 시뮬레이터 연동 가능
+
+        // 시스템 연산 룰
+        let strikes = 0;
+        let balls = 0;
+
+        for (let i = 0; i < 3; i++) {
+            if (guessArray[i] === target[i]) {
+                strikes++;
+            } else if (target.includes(guessArray[i])) {
+                balls++;
+            }
+        }
+
+        logToBoard(`[내 턴 결과] 예측치 [${gl}, ${gm}, ${gr}] => ⚾ ${strikes} Strike / ${balls} Ball`);
+
+        if (strikes === 3) {
+            logToBoard("🎉 축하합니다! 완벽하게 맞추셨습니다! 최종 승리.");
+            clearInterval(gameTimerInterval);
+        }
+    };
+
+
+    /* ========================================================
+     * [힌트 시뮬레이션 및 가로채기(경매) 엔진]
+     * ======================================================== */
+    window.openHintModal = function() {
+        document.getElementById("modal-hint-auction").style.display = "flex";
+    };
+
+    window.closeHintModal = function() {
+        document.getElementById("modal-hint-auction").style.display = "none";
+    };
+
+    window.toggleHintInputs = function() {
+        const type = document.getElementById("hint-type").value;
+        const paramBox = document.getElementById("hint-param-box");
+        const slotBox = document.getElementById("hint-slot-box");
+
+        if (type === "odd") {
+            paramBox.style.display = "none";
+            slotBox.style.display = "none";
+        } else if (type === "sum") {
+            paramBox.style.display = "block";
+            slotBox.style.display = "none";
+            document.getElementById("hint-param-label").innerText = "3장 총합 기준점 (? 이상인가)";
+        } else if (type === "specific") {
+            paramBox.style.display = "block";
+            slotBox.style.display = "block";
+            document.getElementById("hint-param-label").innerText = "선택 카드 수치 기준점 (? 이상인가)";
+        }
+    };
+
+    window.processHintRequest = function() {
+        const type = document.getElementById("hint-type").value;
+        const paramVal = parseInt(document.getElementById("hint-param-value").value);
+        const slotIdx = parseInt(document.getElementById("hint-slot-index").value);
+        const betAmt = parseInt(document.getElementById("hint-token-bet").value);
+
+        if (isNaN(betAmt) || betAmt <= 0) {
+            alert("정상적인 베팅 금액을 입력하십시오.");
+            return;
+        }
+
+        const totalVal = calculateTotalTokenValue();
+        if (totalVal < betAmt) {
+            alert("요청 금액만큼의 토큰 잔액이 부족합니다.");
+            return;
+        }
+
+        // 토큰 자동 소모
+        autoDeductTokens(betAmt);
+        closeHintModal();
+
+        logToBoard(`[시스템] 내가 토큰 $${betAmt}을 걸고 힌트를 청구했습니다.`);
+
+        // AI연습 시뮬레이션 룰: 30% 확률로 거절 위자료 지급 시나리오 발동
+        if (currentGameMode === "AI") {
+            const decision = Math.random();
+            if (decision < 0.25) {
+                // AI 거절 시나리오
+                const compens = betAmt;
+                myDollarBalance += (betAmt + compens);
+                document.getElementById("lbl-balance").innerText = `$${myDollarBalance}`;
+                logToBoard(`[상대 거절] AI가 질문을 거절했습니다! 벌금 배상 조항으로 원금과 동일 보상금 $${compens}가 나에게 역지불 되며 기회가 소진됩니다.`);
+            } else {
+                // 힌트 제공
+                let resultText = "";
+                if (type === "sum") {
+                    const sum = aiTargetCards.reduce((a,b)=>a+b, 0);
+                    resultText = sum >= paramVal ? "그렇다" : "아니다";
+                } else if (type === "odd") {
+                    const odds = aiTargetCards.filter(x => x % 2 !== 0).length;
+                    resultText = `${odds}개`;
+                } else if (type === "specific") {
+                    resultText = aiTargetCards[slotIdx] >= paramVal ? "그렇다" : "아니다";
+                }
+
+                // 가로채기(경매) 모의 유도 시뮬레이터 작동
+                const auctionOdds = Math.random();
+                if (auctionOdds < 0.35) {
+                    const hijackedBid = betAmt + 5;
+                    logToBoard(`[⚠️ 가로채기 발생] 가상 유저가 나보다 높은 $${hijackedBid}를 올려 힌트 답변을 가로챘습니다!`);
+                    logToBoard(`[시스템] 질문의 가치가 상승하여 원금 $${betAmt}는 나에게 환불되며 내 찬스는 파괴되지 않습니다.`);
+                    myDollarBalance += betAmt;
+                    document.getElementById("lbl-balance").innerText = `$${myDollarBalance}`;
+                } else {
+                    logToBoard(`[🔓 시스템 힌트 결과] 오직 나에게만 송신됨: 계산 값 => "${resultText}"`);
+                }
+            }
+        }
+    };
+
+
+    /* ========================================================
+     * [쇼다운 시스팀 - 올인 베팅]
+     * ======================================================== */
+    window.triggerShowdown = function() {
+        const targetVal = prompt("상대방 세 자리 숫자를 정확히 적으세요. (공백 없이 3자리 입력 예: 123)");
+        if (!targetVal || targetVal.length !== 3) return alert("세 자리 숫자 형식이어야 합니다.");
+
+        const sl = parseInt(targetVal[0]);
+        const sm = parseInt(targetVal[1]);
+        const sr = parseInt(targetVal[2]);
+
+        const betAmt = parseInt(prompt("쇼다운에 올인할 베팅 토큰 수량을 달러 가치 단위로 입력하세요:", "100"));
+        if (isNaN(betAmt) || betAmt <= 0) return alert("올바른 액수여야 합니다.");
+
+        const totalTokens = calculateTotalTokenValue();
+        if (totalTokens < betAmt) return alert("보유 토큰이 베팅 한도보다 작습니다.");
+
+        autoDeductTokens(betAmt);
+        logToBoard(`[🚨 쇼다운 선언] 내가 $${betAmt} 가치 토큰을 걸고 패 폭로를 단행했습니다!`);
+
+        const isCorrect = (sl === aiTargetCards[0] && sm === aiTargetCards[1] && sr === aiTargetCards[2]);
+
+        if (isCorrect) {
+            const stealReward = betAmt;
+            myDollarBalance += (betAmt + stealReward);
+            document.getElementById("lbl-balance").innerText = `$${myDollarBalance}`;
+            logToBoard(`[🎉 승리] 쇼다운 성공! 상대방 탈락. 베팅한 금액만큼 상대에게 강탈하여 내 지갑에 합산됩니다!`);
+            alert("게임 끝! 쇼다운을 승리하였습니다.");
+            resetGameEnvironment();
+        } else {
+            logToBoard(`[❌ 오답] 오인 판명! 내가 베팅한 모든 토큰 $${betAmt}는 즉시 중앙 참가비 보관고에 귀속되며, 나는 탈락합니다.`);
+            alert("틀렸습니다! 당신은 탈락했습니다.");
+            resetGameEnvironment();
+        }
+    };
+
+
+    /* ========================================================
+     * [멀티서버 개설 및 방 관리, 탈주자 상금 독식 시스템]
+     * ======================================================== */
+    window.showServerCreation = function() {
+        document.getElementById("modal-server-create").style.display = "flex";
+    };
+
+    window.closeServerModal = function() {
+        document.getElementById("modal-server-create").style.display = "none";
+    };
+
+    window.confirmServerCreation = async function() {
+        const maxPl = parseInt(document.getElementById("srv-max-players").value);
+        const dur = parseInt(document.getElementById("srv-duration").value);
+        const fee = parseInt(document.getElementById("srv-fee").value);
+
+        if (myDollarBalance < fee) {
+            alert("보유 달러가 참가를 보장하는 비용보다 부족합니다.");
+            return;
+        }
+
+        closeServerModal();
+
+        if (isFirebaseConnected) {
+            // 파이어베이스 실시간 방 등록
+            const hostUid = auth.currentUser.uid;
+            const roomId = `${Date.now()}_${hostUid}`;
+            
+            // 방장 자금 트랜잭션 선결제
+            await runTransaction(ref(db, `users/${hostUid}`), (u) => {
+                if (u) {
+                    u.dollarBalance -= fee;
+                }
+                return u;
+            });
+
+            const newRoomRef = ref(db, `rooms/${roomId}`);
+            await set(newRoomRef, {
+                config: { hostUid, maxPlayers: maxPl, durationMinutes: dur, entryFee: fee },
+                status: "PLAYING", // 빠른 시범 대조
+                prizePool: fee,
+                activePlayerCount: 1,
+                players: {
+                    [hostUid]: { nickname: myNickname, isAlive: true }
+                }
+            });
+
+            currentRoomId = roomId;
+            setupRealtimeDisconnectSystem(roomId, hostUid);
+            alert("서버가 생성되었습니다! 실시간 통신 동기화 가동 중.");
+        } else {
+            // 로컬 모킹 테스트 처리
+            myDollarBalance -= fee;
+            document.getElementById("lbl-balance").innerText = `$${myDollarBalance}`;
+            prizePool = fee;
+            alert(`[서버 개설 성공] 기본 참가비 $${fee}가 자동 차감되었습니다. 실시간 인원 모집 대기 상태를 시작합니다.`);
+            
+            // 모의 게임 전환
+            currentGameMode = "MULTIPLAYER";
+            document.getElementById("game-title").innerText = "👥 실시간 멀티플레이 게임방";
+            document.getElementById("lobby-modes").style.display = "none";
+            document.getElementById("game-active-area").style.display = "block";
+            document.getElementById("game-setup-phase").style.display = "block";
+            document.getElementById("game-play-phase").style.display = "none";
+        }
+    };
+
+    function setupRealtimeDisconnectSystem(roomId, myUid) {
+        const playerRef = ref(db, `rooms/${roomId}/players/${myUid}`);
+        const countRef = ref(db, `rooms/${roomId}/activePlayerCount`);
+        const roomRef = ref(db, `rooms/${roomId}`);
+
+        // 플레이어 브라우저 닫기/에러 감지 예약
+        onDisconnect(playerRef).remove();
+        onDisconnect(countRef).transaction((c) => (c || 1) - 1);
+
+        onValue(roomRef, async (snap) => {
+            const data = snap.val();
+            if (data && data.status === "PLAYING" && data.activePlayerCount === 1) {
+                const survivors = Object.keys(data.players);
+                if (survivors.includes(myUid)) {
+                    off(roomRef);
+                    // 최후의 1인 자동 상금 전액 독식
+                    await runTransaction(ref(db, `users/${myUid}`), (u) => {
+                        if (u) {
+                            u.dollarBalance += data.prizePool;
+                        }
+                        return u;
+                    });
+                    await set(ref(db, `rooms/${roomId}`), null); // 클린업
+                    alert(`🏆 [탈주 감지 독식] 모든 대전상대가 방을 이탈했습니다! 벌금 및 누적 상금액 $${data.prizePool}를 전액 독식 회수합니다.`);
+                    resetGameEnvironment();
+                }
+            }
         });
-    });
+    }
 
-    document.getElementById('btnLeaveGameRoom').addEventListener('click', () => {
-        if(confirm("정말 탈락을 감수하고 방을 탈주하시겠습니까? (판돈 전액 몰수)")) {
-            exitToLobby();
-        }
-    });
+    function loadMultiplayerServers() {
+        if (!isFirebaseConnected) return;
+        onValue(ref(db, 'rooms'), (snap) => {
+            const listDiv = document.getElementById("server-list");
+            listDiv.innerHTML = "";
+            const rooms = snap.val();
+            if (!rooms) {
+                listDiv.innerText = "현재 개설된 서버 대기실이 비어 있습니다.";
+                return;
+            }
+            Object.keys(rooms).forEach(id => {
+                const r = rooms[id];
+                const item = document.createElement("div");
+                item.style = "border-bottom:1px solid #ccc; padding:10px; display:flex; justify-content:space-between; align-items:center;";
+                item.innerHTML = `
+                    <span>🏡 방장 참가비: $${r.config.entryFee} / 한도인원: ${r.config.maxPlayers}명 (${r.config.durationMinutes}분 전용)</span>
+                    <button style="padding: 5px 10px; font-size:12px;" onclick="joinRoom('${id}', ${r.config.entryFee})">입장</button>
+                `;
+                listDiv.appendChild(item);
+            });
+        });
+    }
 
-    function exitToLobby() {
-        if(roomUnsubscribe) roomUnsubscribe();
-        showScreen('modeSelectScreen');
+
+    /* ========================================================
+     * [보조 유틸리티 시스템]
+     * ======================================================== */
+    function logToBoard(msg) {
+        const logs = document.getElementById("game-log");
+        logs.innerHTML += `<div>${msg}</div>`;
+        logs.scrollTop = logs.scrollHeight;
+    }
+
+    function startTimer(minutes) {
+        clearInterval(gameTimerInterval);
+        secondsLeft = minutes * 60;
+        gameTimerInterval = setInterval(() => {
+            secondsLeft--;
+            const mins = Math.floor(secondsLeft / 60);
+            const secs = secondsLeft % 60;
+            document.getElementById("game-timer").innerText = `남은시간: ${mins < 10 ? '0' + mins : mins}:${secs < 10 ? '0' + secs : secs}`;
+            if (secondsLeft <= 0) {
+                clearInterval(gameTimerInterval);
+                alert("⏱️ 대전 제한 시간이 완전히 끝났습니다! 카드를 가장 많이 알아맞춘 우승자가 모든 풀 금액을 강제 수합합니다.");
+                resetGameEnvironment();
+            }
+        }, 1000);
+    }
+
+    function resetGameEnvironment() {
+        clearInterval(gameTimerInterval);
+        document.getElementById("game-active-area").style.display = "none";
+        document.getElementById("lobby-modes").style.display = "block";
     }
 </script>
+
 </body>
 </html>
