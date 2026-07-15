@@ -6,41 +6,96 @@
     <title>숫자야구 & 베팅 게임</title>
     <style>
         body { font-family: 'Pretendard', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
-        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 400px; max-height: 80vh; overflow-y: auto; }
         h1 { font-size: 24px; margin-bottom: 20px; color: #333; }
-        input { width: 90%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
-        button { background-color: #0056b3; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        h2 { font-size: 18px; margin-bottom: 15px; color: #555; }
+        input, select { width: 90%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+        button { background-color: #0056b3; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; margin-bottom: 10px; transition: 0.2s; }
         button:hover { background-color: #004494; }
+        .btn-secondary { background-color: #28a745; }
+        .btn-secondary:hover { background-color: #218838; }
+        .btn-outline { background-color: white; color: #333; border: 1px solid #ccc; }
+        .btn-outline:hover { background-color: #f0f0f0; }
         .hidden { display: none; }
-        #userInfo { font-weight: bold; color: #2e7d32; margin-top: 20px; }
+        #userInfo { font-weight: bold; color: #2e7d32; margin-top: 10px; margin-bottom: 20px; }
+        .room-item { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 10px; text-align: left; background-color: #fafafa; }
+        .room-item p { margin: 5px 0; font-size: 14px; }
+        .room-btn { background-color: #ff9800; width: auto; padding: 8px 15px; font-size: 14px; float: right; margin-top: -30px; }
     </style>
 </head>
 <body>
 
+<!-- 1. 로그인 화면 -->
 <div class="container" id="loginScreen">
     <h1>🎯 로그인</h1>
     <p>이화여고 계정(@ewha.hs.kr)으로만<br>접속할 수 있습니다.</p>
     <button id="loginBtn">구글 학교 계정으로 시작하기</button>
 </div>
 
+<!-- 2. 닉네임 설정 화면 -->
 <div class="container hidden" id="nicknameScreen">
     <h1>📛 닉네임 설정</h1>
-    <p>게임에서 사용할 닉네임을 입력하세요.<br>(중복 불가)</p>
+    <p>게임에서 사용할 닉네임을 입력하세요.</p>
     <input type="text" id="nicknameInput" placeholder="닉네임 입력">
     <button id="checkNicknameBtn">가입 완료 및 $500 받기</button>
 </div>
 
-<div class="container hidden" id="lobbyScreen">
-    <h1>🎮 게임 로비</h1>
-    <div id="userInfo"></div>
-    <p>게임 서버 목록이 여기에 표시될 예정입니다.</p>
+<!-- 3. 모드 선택 화면 (로비) -->
+<div class="container hidden" id="modeSelectScreen">
+    <h1>🎮 게임 모드 선택</h1>
+    <div id="userInfoDisplay"></div>
+    <button id="btnAiMode" class="btn-secondary">🤖 AI와 연습게임 (점수 미반영)</button>
+    <button id="btnMultiMode">👥 다른 사용자와 하기</button>
+</div>
+
+<!-- 4. 멀티플레이 로비 (방 목록) -->
+<div class="container hidden" id="multiplayerScreen">
+    <h1>👥 멀티플레이 서버</h1>
+    <button id="btnShowCreateRoom" class="btn-secondary">➕ 방 만들기 (서버 생성)</button>
+    <button id="btnBackToMode" class="btn-outline">◀ 뒤로 가기</button>
+    <h2>현재 대기 중인 방</h2>
+    <div id="roomList">
+        <!-- 방 목록이 여기에 표시됩니다 -->
+    </div>
+</div>
+
+<!-- 5. 방 만들기 화면 -->
+<div class="container hidden" id="createRoomScreen">
+    <h1>🛠 서버 생성</h1>
+    
+    <p>참여자 수</p>
+    <select id="roomPlayers">
+        <option value="2">2명</option>
+        <option value="3">3명</option>
+        <option value="4">4명</option>
+    </select>
+
+    <p>진행 시간</p>
+    <select id="roomTime">
+        <option value="10">10분</option>
+        <option value="15">15분</option>
+        <option value="20">20분</option>
+    </select>
+
+    <p>참가비 (토큰)</p>
+    <select id="roomFee">
+        <option value="1">하얀색 ($1)</option>
+        <option value="2">분홍색 ($2)</option>
+        <option value="5">빨간색 ($5)</option>
+        <option value="10">파란색 ($10)</option>
+        <option value="25">초록색 ($25)</option>
+        <option value="100">검은색 ($100)</option>
+    </select>
+
+    <button id="btnCreateRoomSubmit">서버 열기</button>
+    <button id="btnCancelCreate" class="btn-outline">취소</button>
 </div>
 
 <!-- Firebase SDK -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAcEaCvwVQPU-3gCc1P_MhAYsZofq60g_o",
@@ -48,8 +103,7 @@
         projectId: "math-0715",
         storageBucket: "math-0715.firebasestorage.app",
         messagingSenderId: "725297586702",
-        appId: "1:725297586702:web:2412b0e723e1228bf8525f",
-        measurementId: "G-4FFLTBQ7KN"
+        appId: "1:725297586702:web:2412b0e723e1228bf8525f"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -57,75 +111,144 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    let currentUserEmail = "";
+    let currentUser = null;
+    let userData = null;
 
+    // 화면 전환 함수
     function showScreen(screenId) {
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('nicknameScreen').classList.add('hidden');
-        document.getElementById('lobbyScreen').classList.add('hidden');
+        const screens = ['loginScreen', 'nicknameScreen', 'modeSelectScreen', 'multiplayerScreen', 'createRoomScreen'];
+        screens.forEach(id => document.getElementById(id).classList.add('hidden'));
         document.getElementById(screenId).classList.remove('hidden');
     }
 
+    // --- 로그인 로직 ---
     document.getElementById('loginBtn').addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
-            const user = result.user;
+            currentUser = result.user;
             
-            if (!user.email.endsWith('@ewha.hs.kr')) {
+            if (!currentUser.email.endsWith('@ewha.hs.kr')) {
                 alert("이화여고 계정(@ewha.hs.kr)으로만 가입할 수 있습니다!");
                 await signOut(auth);
                 return;
             }
 
-            currentUserEmail = user.email;
-            const userRef = doc(db, "users", user.email);
+            const userRef = doc(db, "users", currentUser.email);
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
-                const userData = userSnap.data();
-                document.getElementById('userInfo').innerText = `${userData.nickname}님 (보유 자금: $${userData.money})`;
-                showScreen('lobbyScreen');
+                userData = userSnap.data();
+                document.getElementById('userInfoDisplay').innerText = `${userData.nickname}님 (보유 자금: $${userData.money})`;
+                showScreen('modeSelectScreen');
             } else {
                 showScreen('nicknameScreen');
             }
         } catch (error) {
-            console.error("로그인 에러:", error);
-            alert("로그인 중 문제가 발생했습니다.");
+            console.error(error);
+            alert("로그인 에러! (F12 콘솔 확인)");
         }
     });
 
+    // --- 닉네임 설정 및 가입 ---
     document.getElementById('checkNicknameBtn').addEventListener('click', async () => {
         const nickname = document.getElementById('nicknameInput').value.trim();
-        
-        if (nickname.length < 2) {
-            alert("닉네임은 2글자 이상 입력해주세요.");
-            return;
-        }
+        if (nickname.length < 2) return alert("닉네임은 2글자 이상!");
 
         const q = query(collection(db, "users"), where("nickname", "==", nickname));
-        const querySnapshot = await getDocs(q);
+        const snap = await getDocs(q);
+        if (!snap.empty) return alert("이미 있는 닉네임입니다.");
 
-        if (!querySnapshot.empty) {
-            alert("이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.");
-            return;
+        await setDoc(doc(db, "users", currentUser.email), {
+            email: currentUser.email,
+            nickname: nickname,
+            money: 500,
+            createdAt: serverTimestamp()
+        });
+
+        userData = { nickname: nickname, money: 500 };
+        document.getElementById('userInfoDisplay').innerText = `${userData.nickname}님 (보유 자금: $500)`;
+        alert("가입 성공! $500가 지급되었습니다.");
+        showScreen('modeSelectScreen');
+    });
+
+    // --- 로비 네비게이션 ---
+    document.getElementById('btnAiMode').addEventListener('click', () => {
+        alert("AI 연습 게임 기능은 현재 준비 중입니다!");
+    });
+
+    document.getElementById('btnMultiMode').addEventListener('click', () => {
+        showScreen('multiplayerScreen');
+        loadRooms();
+    });
+
+    document.getElementById('btnBackToMode').addEventListener('click', () => {
+        showScreen('modeSelectScreen');
+    });
+
+    document.getElementById('btnShowCreateRoom').addEventListener('click', () => {
+        showScreen('createRoomScreen');
+    });
+
+    document.getElementById('btnCancelCreate').addEventListener('click', () => {
+        showScreen('multiplayerScreen');
+    });
+
+    // --- 방 만들기 (서버 생성) ---
+    document.getElementById('btnCreateRoomSubmit').addEventListener('click', async () => {
+        const players = document.getElementById('roomPlayers').value;
+        const time = document.getElementById('roomTime').value;
+        const fee = document.getElementById('roomFee').value;
+
+        if (userData.money < parseInt(fee)) {
+            return alert("보유 자금이 부족하여 이 참가비의 방을 만들 수 없습니다!");
         }
 
         try {
-            await setDoc(doc(db, "users", currentUserEmail), {
-                email: currentUserEmail,
-                nickname: nickname,
-                money: 500,
-                createdAt: new Date()
+            await addDoc(collection(db, "rooms"), {
+                host: userData.nickname,
+                maxPlayers: players,
+                currentPlayers: 1,
+                timeLimit: time,
+                entryFee: fee,
+                status: "waiting",
+                playersList: [userData.nickname],
+                createdAt: serverTimestamp()
             });
-
-            alert("가입이 완료되었습니다! 500달러가 지급되었습니다.");
-            document.getElementById('userInfo').innerText = `${nickname}님 (보유 자금: $500)`;
-            showScreen('lobbyScreen');
+            alert("서버가 생성되었습니다!");
+            showScreen('multiplayerScreen');
         } catch (error) {
-            console.error("저장 에러:", error);
-            alert("가입 처리 중 문제가 발생했습니다.");
+            console.error("방 생성 에러:", error);
         }
     });
+
+    // --- 방 목록 실시간 불러오기 ---
+    function loadRooms() {
+        const q = query(collection(db, "rooms"), where("status", "==", "waiting"));
+        onSnapshot(q, (snapshot) => {
+            const roomListDiv = document.getElementById('roomList');
+            roomListDiv.innerHTML = "";
+            
+            if (snapshot.empty) {
+                roomListDiv.innerHTML = "<p>현재 대기 중인 방이 없습니다.</p>";
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const room = docSnap.data();
+                const roomId = docSnap.id;
+                
+                const roomDiv = document.createElement('div');
+                roomDiv.className = 'room-item';
+                roomDiv.innerHTML = `
+                    <p>👑 <b>${room.host}</b>님의 방</p>
+                    <p>👥 인원: ${room.currentPlayers} / ${room.maxPlayers}명 | ⏱ 시간: ${room.timeLimit}분</p>
+                    <p>💰 참가비: $${room.entryFee}</p>
+                    <button class="room-btn" onclick="alert('방 입장 기능 구현 중입니다!')">참여하기</button>
+                `;
+                roomListDiv.appendChild(roomDiv);
+            });
+        });
+    }
 </script>
 </body>
 </html>
