@@ -36,13 +36,12 @@
     <p>게임 서버 목록이 여기에 표시될 예정입니다.</p>
 </div>
 
-<!-- Firebase SDK (모듈 방식) -->
+<!-- Firebase SDK -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 🔴 쉼표(,) 누락 부분 수정 완료!
     const firebaseConfig = {
         apiKey: "AIzaSyAcEaCvwVQPU-3gCc1P_MhAYsZofq60g_o",
         authDomain: "math-0715.firebaseapp.com",
@@ -60,7 +59,6 @@
 
     let currentUserEmail = "";
 
-    // 화면 전환 함수
     function showScreen(screenId) {
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('nicknameScreen').classList.add('hidden');
@@ -68,41 +66,34 @@
         document.getElementById(screenId).classList.remove('hidden');
     }
 
-    // 1. 구글 로그인 버튼 클릭 시
     document.getElementById('loginBtn').addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             
-            // 이화여고 도메인 검사
             if (!user.email.endsWith('@ewha.hs.kr')) {
                 alert("이화여고 계정(@ewha.hs.kr)으로만 가입할 수 있습니다!");
-                await signOut(auth); // 조건 안 맞으면 강제 로그아웃
+                await signOut(auth);
                 return;
             }
 
             currentUserEmail = user.email;
-
-            // 이미 가입된 유저인지 Firestore에서 확인
             const userRef = doc(db, "users", user.email);
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
-                // 이미 가입된 유저면 바로 로비로 이동
                 const userData = userSnap.data();
                 document.getElementById('userInfo').innerText = `${userData.nickname}님 (보유 자금: $${userData.money})`;
                 showScreen('lobbyScreen');
             } else {
-                // 신규 유저면 닉네임 설정 화면으로 이동
                 showScreen('nicknameScreen');
             }
         } catch (error) {
             console.error("로그인 에러:", error);
-            alert("로그인 중 문제가 발생했습니다. (F12 콘솔 창 확인 필요)");
+            alert("로그인 중 문제가 발생했습니다.");
         }
     });
 
-    // 2. 닉네임 중복 확인 및 가입 완료 버튼 클릭 시
     document.getElementById('checkNicknameBtn').addEventListener('click', async () => {
         const nickname = document.getElementById('nicknameInput').value.trim();
         
@@ -111,7 +102,6 @@
             return;
         }
 
-        // 닉네임 중복 검사 (users 컬렉션 전체 뒤지기)
         const q = query(collection(db, "users"), where("nickname", "==", nickname));
         const querySnapshot = await getDocs(q);
 
@@ -120,7 +110,6 @@
             return;
         }
 
-        // 중복이 아니면 유저 정보 저장 (기본 자금 $500)
         try {
             await setDoc(doc(db, "users", currentUserEmail), {
                 email: currentUserEmail,
