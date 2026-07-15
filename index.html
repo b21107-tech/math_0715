@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숫자야구 & 베팅 게임</title>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        h1 { font-size: 24px; margin-bottom: 20px; color: #333; }
+        input { width: 90%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+        button { background-color: #0056b3; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        button:hover { background-color: #004494; }
+        .hidden { display: none; }
+        #userInfo { font-weight: bold; color: #2e7d32; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="loginScreen">
+    <h1>🎯 로그인</h1>
+    <p>이화여고 계정(@ewha.hs.kr)으로만<br>접속할 수 있습니다.</p>
+    <button id="loginBtn">구글 학교 계정으로 시작하기</button>
+</div>
+
+<div class="container hidden" id="nicknameScreen">
+    <h1>📛 닉네임 설정</h1>
+    <p>게임에서 사용할 닉네임을 입력하세요.<br>(중복 불가)</p>
+    <input type="text" id="nicknameInput" placeholder="닉네임 입력">
+    <button id="checkNicknameBtn">가입 완료 및 $500 받기</button>
+</div>
+
+<div class="container hidden" id="lobbyScreen">
+    <h1>🎮 게임 로비</h1>
+    <div id="userInfo"></div>
+    <p>게임 서버 목록이 여기에 표시될 예정입니다.</p>
+</div>
+
+<!-- Firebase SDK (모듈 방식) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 🔴 쉼표(,) 누락 부분 수정 완료!
+    const firebaseConfig = {
+        apiKey: "AIzaSyAcEaCvwVQPU-3gCc1P_MhAYsZofq60g_o",
+        authDomain: "math-0715.firebaseapp.com",
+        projectId: "math-0715",
+        storageBucket: "math-0715.firebasestorage.app",
+        messagingSenderId: "725297586702",
+        appId: "1:725297586702:web:2412b0e723e1228bf8525f",
+        measurementId: "G-4FFLTBQ7KN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let currentUserEmail = "";
+
+    // 화면 전환 함수
+    function showScreen(screenId) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('nicknameScreen').classList.add('hidden');
+        document.getElementById('lobbyScreen').classList.add('hidden');
+        document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    // 1. 구글 로그인 버튼 클릭 시
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            
+            // 이화여고 도메인 검사
+            if (!user.email.endsWith('@ewha.hs.kr')) {
+                alert("이화여고 계정(@ewha.hs.kr)으로만 가입할 수 있습니다!");
+                await signOut(auth); // 조건 안 맞으면 강제 로그아웃
+                return;
+            }
+
+            currentUserEmail = user.email;
+
+            // 이미 가입된 유저인지 Firestore에서 확인
+            const userRef = doc(db, "users", user.email);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                // 이미 가입된 유저면 바로 로비로 이동
+                const userData = userSnap.data();
+                document.getElementById('userInfo').innerText = `${userData.nickname}님 (보유 자금: $${userData.money})`;
+                showScreen('lobbyScreen');
+            } else {
+                // 신규 유저면 닉네임 설정 화면으로 이동
+                showScreen('nicknameScreen');
+            }
+        } catch (error) {
+            console.error("로그인 에러:", error);
+            alert("로그인 중 문제가 발생했습니다. (F12 콘솔 창 확인 필요)");
+        }
+    });
+
+    // 2. 닉네임 중복 확인 및 가입 완료 버튼 클릭 시
+    document.getElementById('checkNicknameBtn').addEventListener('click', async () => {
+        const nickname = document.getElementById('nicknameInput').value.trim();
+        
+        if (nickname.length < 2) {
+            alert("닉네임은 2글자 이상 입력해주세요.");
+            return;
+        }
+
+        // 닉네임 중복 검사 (users 컬렉션 전체 뒤지기)
+        const q = query(collection(db, "users"), where("nickname", "==", nickname));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            alert("이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.");
+            return;
+        }
+
+        // 중복이 아니면 유저 정보 저장 (기본 자금 $500)
+        try {
+            await setDoc(doc(db, "users", currentUserEmail), {
+                email: currentUserEmail,
+                nickname: nickname,
+                money: 500,
+                createdAt: new Date()
+            });
+
+            alert("가입이 완료되었습니다! 500달러가 지급되었습니다.");
+            document.getElementById('userInfo').innerText = `${nickname}님 (보유 자금: $500)`;
+            showScreen('lobbyScreen');
+        } catch (error) {
+            console.error("저장 에러:", error);
+            alert("가입 처리 중 문제가 발생했습니다.");
+        }
+    });
+</script>
+</body>
+</html>
